@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>タイマー</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: sans-serif;
+      background: #f0f4f8;
+    }
+    #display {
+      font-size: 80px;
+      font-weight: bold;
+      color: #2d3748;
+      margin-bottom: 40px;
+    }
+    button {
+      margin: 0 10px;
+      padding: 12px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #startBtn { background: #48bb78; color: white; }
+    #stopBtn  { background: #fc8181; color: white; }
+    #resetBtn { background: #a0aec0; color: white; }
+  </style>
+</head>
+<body>
+  <div id="display">00:00</div>
+  <div>
+    <button id="startBtn" onclick="start()">スタート</button>
+    <button id="stopBtn"  onclick="stop()">ストップ</button>
+    <button id="resetBtn" onclick="reset()">リセット</button>
+  </div>
+  <script>
+    let seconds = 0;
+    let timer = null;
+
+    function update() {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('display').textContent = m + ':' + s;
+    }
+
+    function start() {
+      if (timer) return;
+      timer = setInterval(() => { seconds++; update(); }, 1000);
+    }
+
+    function stop() {
+      clearInterval(timer);
+      timer = null;
+    }
+
+    function reset() {
+      stop();
+      seconds = 0;
+      update();
+    }
+  </script>
+</body>
+</html>
