@@ -58,7 +58,6 @@
 
     .cloud { position: absolute; font-size: 1.8rem; opacity: 0.9; }
 
-    /* 野生ポケモン */
     #poke-img {
       position: absolute;
       width: 110px;
@@ -69,16 +68,9 @@
       filter: drop-shadow(3px 6px 5px rgba(0,0,0,0.35));
       display: none;
     }
-
-    #poke-img.idle {
-      animation: bounce 0.7s ease-in-out infinite alternate;
-    }
-    #poke-img.caught {
-      animation: catchAnim 0.85s ease forwards;
-    }
-    #poke-img.fled {
-      animation: fleeAnim 0.75s ease forwards;
-    }
+    #poke-img.idle   { animation: bounce 0.7s ease-in-out infinite alternate; }
+    #poke-img.caught { animation: catchAnim 0.85s ease forwards; }
+    #poke-img.fled   { animation: fleeAnim 0.75s ease forwards; }
 
     @keyframes bounce {
       from { transform: translateX(-50%) translateY(0); }
@@ -87,16 +79,15 @@
     @keyframes catchAnim {
       0%   { transform: translateX(-50%) scale(1);   opacity: 1; filter: brightness(1); }
       25%  { transform: translateX(-50%) scale(1.1); opacity: 1; filter: brightness(8) saturate(0); }
-      55%  { transform: translateX(-50%) scale(0.6); opacity: 0.7; filter: brightness(1); }
+      55%  { transform: translateX(-50%) scale(0.6); opacity: 0.7; }
       100% { transform: translateX(-50%) scale(0);   opacity: 0; }
     }
     @keyframes fleeAnim {
-      0%   { transform: translateX(-50%);          opacity: 1; }
-      30%  { transform: translateX(40px);          opacity: 1; }
-      100% { transform: translateX(320px);         opacity: 0; }
+      0%   { transform: translateX(-50%);  opacity: 1; }
+      30%  { transform: translateX(40px);  opacity: 1; }
+      100% { transform: translateX(320px); opacity: 0; }
     }
 
-    /* ポケボール */
     #pokeball {
       position: absolute;
       bottom: 18px;
@@ -108,7 +99,6 @@
       z-index: 10;
     }
 
-    /* Lvバッジ */
     .lv-badge {
       position: absolute;
       top: 12px;
@@ -132,11 +122,10 @@
       min-height: 3.4rem;
       display: flex;
       align-items: center;
-      gap: 0.3rem;
     }
 
     /* ===== 計算エリア ===== */
-    .math-area {
+    #math-area {
       background: #eef4ff;
       border-top: 3px solid #c8d8ff;
       padding: 0.9rem 1.1rem 0.7rem;
@@ -154,7 +143,6 @@
     .q   { color: #6c5ce7; }
     .sep { color: #636e72; }
 
-    /* 選択肢 */
     .choices {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -190,6 +178,96 @@
     @keyframes btnPop   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
     @keyframes btnShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 
+    /* ===== ゲット祝福画面 ===== */
+    #catch-screen {
+      display: none;
+      background: linear-gradient(150deg, #fff9e6 0%, #ffeaa7 50%, #fdcb6e 100%);
+      border-top: 3px solid #e8b800;
+      padding: 1.1rem 1.2rem 1rem;
+      text-align: center;
+      animation: fadeSlideIn 0.35s ease;
+    }
+    #catch-screen.show { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .catch-header {
+      font-size: 1.35rem;
+      font-weight: bold;
+      color: #c0392b;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.05em;
+    }
+
+    .catch-sprite-wrap {
+      margin: 0 auto 0.4rem;
+      width: 130px;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      border: 3px solid rgba(255,200,0,0.5);
+    }
+
+    #catch-sprite {
+      width: 112px;
+      image-rendering: pixelated;
+      filter: drop-shadow(2px 5px 4px rgba(0,0,0,0.2));
+      animation: catchPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+
+    @keyframes catchPopIn {
+      0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+      60%  { transform: scale(1.18) rotate(5deg); }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    .catch-name  { font-size: 2rem; font-weight: bold; color: #1a1a2e; margin: 0.3rem 0 0.1rem; }
+    .catch-genus { font-size: 0.88rem; color: #636e72; margin-bottom: 0.45rem; }
+
+    .catch-stats {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 0.7rem;
+    }
+    .catch-stats span { background: rgba(255,255,255,0.65); border-radius: 8px; padding: 3px 10px; }
+
+    .catch-desc {
+      background: rgba(255,255,255,0.7);
+      border-radius: 12px;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.88rem;
+      color: #333;
+      line-height: 1.7;
+      text-align: left;
+      margin-bottom: 0.9rem;
+      min-height: 3.5rem;
+    }
+
+    .next-btn {
+      font-family: inherit;
+      font-size: 1.15rem;
+      font-weight: bold;
+      padding: 0.72rem;
+      width: 100%;
+      border: 3px solid #1a1a2e;
+      border-radius: 14px;
+      background: #1a1a2e;
+      color: #fdcb6e;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.35);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .next-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+
     /* ===== 結果画面 ===== */
     #result-screen { display:none; width:100%; max-width:460px; }
     #result-screen.show { display:block; }
@@ -209,7 +287,6 @@
     .result-title { font-size: 1.7rem; text-align: center; }
     .result-sub   { font-size: 1rem;   text-align: center; color: #636e72; }
 
-    /* ゲットしたポケモン一覧 */
     .collection {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -228,20 +305,17 @@
       overflow: hidden;
       padding: 2px;
     }
-
     .poke-slot img {
       width: 52px;
       image-rendering: pixelated;
       animation: slotPop 0.45s ease both;
     }
-
     .poke-slot .sname {
       font-size: 0.58rem;
       color: #444;
       text-align: center;
       line-height: 1.1;
     }
-
     .poke-slot.empty { opacity: 0.3; }
     .poke-slot.empty::before { content: '？'; font-size: 1.6rem; color: #aaa; }
 
@@ -297,7 +371,9 @@
     <div id="pokeball">🔴</div>
   </div>
   <div class="dialog" id="dialog">よみこみちゅう…⌛</div>
-  <div class="math-area">
+
+  <!-- 計算エリア -->
+  <div id="math-area">
     <div class="formula">
       <span class="num" id="fa">?</span>
       <span class="op"  id="fop">＋</span>
@@ -306,6 +382,22 @@
       <span class="q">？</span>
     </div>
     <div class="choices" id="choices"></div>
+  </div>
+
+  <!-- ゲット祝福画面（正解後に表示） -->
+  <div id="catch-screen">
+    <div class="catch-header">🎉 ゲットだぜ！ 🎉</div>
+    <div class="catch-sprite-wrap">
+      <img id="catch-sprite" src="" alt="ポケモン">
+    </div>
+    <div class="catch-name"  id="catch-name"></div>
+    <div class="catch-genus" id="catch-genus"></div>
+    <div class="catch-stats">
+      <span id="catch-height">たかさ：－</span>
+      <span id="catch-weight">おもさ：－</span>
+    </div>
+    <div class="catch-desc" id="catch-desc"></div>
+    <button class="next-btn" id="next-btn">つぎのもんだいへ！ →</button>
   </div>
 </div>
 
@@ -327,7 +419,7 @@
   let caught  = [];
   let cache   = {};
 
-  // ===== PokéAPI =====
+  // ===== PokéAPI（ポケモン情報を詳しく取得） =====
   async function getPoke(id) {
     if (cache[id]) return cache[id];
     const [p, s] = await Promise.all([
@@ -338,7 +430,13 @@
       s.names.find(n => n.language.name === 'ja-Hrkt')?.name ||
       s.names.find(n => n.language.name === 'ja')?.name ||
       p.name;
-    return cache[id] = { id, name, sprite: p.sprites.front_default };
+    const genus = s.genera.find(g => g.language.name === 'ja')?.genus || '';
+    const flavor = s.flavor_text_entries
+      .filter(f => f.language.name === 'ja')
+      .pop()?.flavor_text.replace(/[\f\n]/g, ' ') || '';
+    const height = (p.height / 10).toFixed(1);
+    const weight = (p.weight / 10).toFixed(1);
+    return cache[id] = { id, name, sprite: p.sprites.front_default, genus, flavor, height, weight };
   }
 
   const rand  = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -361,12 +459,37 @@
     return [...s].sort(() => Math.random() - 0.5);
   }
 
+  // ===== ゲット祝福画面の表示／非表示 =====
+  function showCatchScreen(poke) {
+    document.getElementById('math-area').style.display   = 'none';
+    document.getElementById('catch-sprite').src          = poke.sprite;
+    document.getElementById('catch-name').textContent    = poke.name;
+    document.getElementById('catch-genus').textContent   = poke.genus;
+    document.getElementById('catch-height').textContent  = `たかさ：${poke.height}m`;
+    document.getElementById('catch-weight').textContent  = `おもさ：${poke.weight}kg`;
+    document.getElementById('catch-desc').textContent    = poke.flavor || '（せつめいなし）';
+    document.getElementById('catch-screen').classList.add('show');
+  }
+
+  function hideCatchScreen() {
+    document.getElementById('catch-screen').classList.remove('show');
+    document.getElementById('math-area').style.display = '';
+  }
+
+  // ボタンが押されるまで待つ
+  function waitForNext() {
+    return new Promise(resolve => {
+      document.getElementById('next-btn').onclick = resolve;
+    });
+  }
+
   // ===== ゲーム開始 =====
   function startGame() {
     qNum = 0; gotCount = 0; caught = [];
     document.getElementById('result-screen').classList.remove('show');
     document.getElementById('quiz-screen').style.display = '';
     document.getElementById('got-count').textContent = 0;
+    hideCatchScreen();
     nextQ();
   }
 
@@ -380,30 +503,25 @@
     const pi = document.getElementById('poke-img');
     const pb = document.getElementById('pokeball');
 
-    // リセット
     pi.className = '';
     pi.src = '';
     pi.style.display = 'none';
     pb.style.cssText = 'position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:2.1rem;display:none;pointer-events:none;z-index:10;';
 
-    // ランダムなポケモン取得（第一世代）
     curPoke = await getPoke(rand(1, 151));
 
-    // ポケモン表示
     pi.src = curPoke.sprite;
     pi.style.display = 'block';
-    pi.offsetWidth; // reflow
+    pi.offsetWidth;
     pi.className = 'idle';
     document.getElementById('poke-lv').textContent = rand(2, 15);
-    document.getElementById('dialog').textContent = `やせいの ${curPoke.name} が あらわれた！`;
+    document.getElementById('dialog').textContent  = `やせいの ${curPoke.name} が あらわれた！`;
 
-    // 計算問題を表示
     const q = makeQ();
     document.getElementById('fa').textContent  = q.a;
     document.getElementById('fop').textContent = q.op === '+' ? '＋' : '－';
     document.getElementById('fb').textContent  = q.b;
 
-    // 選択肢ボタン
     makeChoices(q.ans).forEach(v => {
       const btn = document.createElement('button');
       btn.className = 'choice-btn';
@@ -430,19 +548,19 @@
       beep(true);
       document.getElementById('dialog').textContent = 'ポケボールを なげた！';
 
-      // ① ポケボール投げる（CSS transition）
-      pb.style.display = 'block';
+      // ① ポケボール投げる
+      pb.style.display    = 'block';
       pb.style.transition = 'none';
       pb.style.transform  = 'translateX(-50%) translateY(0) rotate(0deg)';
-      pb.offsetWidth; // reflow
+      pb.offsetWidth;
       pb.style.transition = 'transform 0.52s cubic-bezier(0.2,0.8,0.4,1)';
       pb.style.transform  = 'translateX(-50%) translateY(-100px) rotate(540deg)';
 
-      // ② ポケモンが白く光って消える
+      // ② ポケモンが光って消える
       await sleep(280);
       pi.className = 'caught';
 
-      // ③ ボールが着地した位置で固定
+      // ③ ボール着地
       await sleep(580);
       pb.style.transition = 'none';
       pb.style.transform  = 'translateX(-50%) translateY(-100px) rotate(0deg)';
@@ -461,15 +579,19 @@
         await sleep(120);
       }
 
-      // ⑤ ゲット確定！
-      pb.style.transition = 'opacity 0.4s';
+      // ⑤ ゲット確定 → 祝福画面へ
+      pb.style.transition = 'opacity 0.3s';
       pb.style.opacity    = '0';
       gotCount++;
       caught.push(curPoke);
       document.getElementById('got-count').textContent = gotCount;
       document.getElementById('dialog').textContent    = `${curPoke.name} を ゲットした！🎉`;
       spawnStars();
-      await sleep(1300);
+
+      await sleep(500);
+      showCatchScreen(curPoke);      // 祝福画面を表示
+      await waitForNext();           // ボタンが押されるまで待つ
+      hideCatchScreen();
 
     } else {
       // ===== 不正解：にげられた =====
@@ -529,7 +651,6 @@
       const g   = ctx.createGain();
       g.connect(ctx.destination);
       if (ok) {
-        // 正解：上昇メロディ
         [[523,0],[659,.12],[784,.24],[1047,.38]].forEach(([f, t]) => {
           const o = ctx.createOscillator();
           o.connect(g); o.frequency.value = f;
@@ -539,7 +660,6 @@
           o.stop(ctx.currentTime + t + .18);
         });
       } else {
-        // 不正解：下降音
         const o = ctx.createOscillator();
         o.connect(g);
         o.frequency.value = 220;
@@ -570,7 +690,6 @@
     });
   }
 
-  // ===== スタート =====
   startGame();
 </script>
 </body>
