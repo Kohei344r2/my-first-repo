@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ポケモン けいさん</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
+      background: #4a7c32;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.8rem;
+      gap: 0.6rem;
+    }
+
+    /* ===== スコアバー ===== */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .chip {
+      background: #1a1a2e;
+      color: #fff;
+      border: 3px solid #000;
+      border-radius: 12px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    /* ===== メインカード ===== */
+    .game-card {
+      width: 100%;
+      max-width: 460px;
+      border: 4px solid #1a1a2e;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 5px 5px 0 #1a1a2e;
+    }
+
+    /* ===== バトル画面 ===== */
+    .scene {
+      height: 210px;
+      background: linear-gradient(to bottom,
+        #74c0f5 0%, #b8e4ff 54%,
+        #5faa38 54.1%, #4a8a28 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cloud { position: absolute; font-size: 1.8rem; opacity: 0.9; }
+
+    /* 野生ポケモン */
+    #poke-img {
+      position: absolute;
+      width: 110px;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      image-rendering: pixelated;
+      filter: drop-shadow(3px 6px 5px rgba(0,0,0,0.35));
+      display: none;
+    }
+
+    #poke-img.idle {
+      animation: bounce 0.7s ease-in-out infinite alternate;
+    }
+    #poke-img.caught {
+      animation: catchAnim 0.85s ease forwards;
+    }
+    #poke-img.fled {
+      animation: fleeAnim 0.75s ease forwards;
+    }
+
+    @keyframes bounce {
+      from { transform: translateX(-50%) translateY(0); }
+      to   { transform: translateX(-50%) translateY(-9px); }
+    }
+    @keyframes catchAnim {
+      0%   { transform: translateX(-50%) scale(1);   opacity: 1; filter: brightness(1); }
+      25%  { transform: translateX(-50%) scale(1.1); opacity: 1; filter: brightness(8) saturate(0); }
+      55%  { transform: translateX(-50%) scale(0.6); opacity: 0.7; filter: brightness(1); }
+      100% { transform: translateX(-50%) scale(0);   opacity: 0; }
+    }
+    @keyframes fleeAnim {
+      0%   { transform: translateX(-50%);          opacity: 1; }
+      30%  { transform: translateX(40px);          opacity: 1; }
+      100% { transform: translateX(320px);         opacity: 0; }
+    }
+
+    /* ポケボール */
+    #pokeball {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.1rem;
+      display: none;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Lvバッジ */
+    .lv-badge {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: rgba(255,255,255,0.92);
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* ===== ダイアログ ===== */
+    .dialog {
+      background: #fff;
+      border-top: 4px solid #1a1a2e;
+      padding: 0.75rem 1.1rem;
+      font-size: 1.05rem;
+      font-weight: bold;
+      min-height: 3.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* ===== 計算エリア ===== */
+    .math-area {
+      background: #eef4ff;
+      border-top: 3px solid #c8d8ff;
+      padding: 0.9rem 1.1rem 0.7rem;
+      text-align: center;
+    }
+
+    .formula {
+      font-size: 3.4rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.7rem;
+    }
+    .num { color: #e17055; }
+    .op  { color: #0984e3; }
+    .q   { color: #6c5ce7; }
+    .sep { color: #636e72; }
+
+    /* 選択肢 */
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+
+    .choice-btn {
+      font-family: inherit;
+      font-size: 2rem;
+      font-weight: bold;
+      padding: 0.45rem;
+      border: 3px solid #1a1a2e;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #1a1a2e;
+      color: #fff;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .choice-btn:nth-child(1) { background: #74b9ff; }
+    .choice-btn:nth-child(2) { background: #a29bfe; }
+    .choice-btn:nth-child(3) { background: #55efc4; color: #1a1a2e; }
+    .choice-btn:nth-child(4) { background: #fd79a8; }
+
+    .choice-btn:hover:not(:disabled)  { transform: translateY(-2px); box-shadow: 0 6px 0 #1a1a2e; }
+    .choice-btn:active:not(:disabled) { transform: translateY(3px);  box-shadow: 0 1px 0 #1a1a2e; }
+    .choice-btn:disabled { cursor: default; }
+
+    .choice-btn.correct { background: #00b894 !important; color: #fff !important;
+                          border-color: #007a61; animation: btnPop 0.3s ease; }
+    .choice-btn.wrong   { background: #d63031 !important; color: #fff !important;
+                          border-color: #900;    animation: btnShake 0.3s ease; }
+
+    @keyframes btnPop   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    @keyframes btnShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+    /* ===== 結果画面 ===== */
+    #result-screen { display:none; width:100%; max-width:460px; }
+    #result-screen.show { display:block; }
+
+    .result-card {
+      background: #fff;
+      border: 4px solid #1a1a2e;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 5px 5px 0 #1a1a2e;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .result-title { font-size: 1.7rem; text-align: center; }
+    .result-sub   { font-size: 1rem;   text-align: center; color: #636e72; }
+
+    /* ゲットしたポケモン一覧 */
+    .collection {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
+    }
+
+    .poke-slot {
+      aspect-ratio: 1;
+      background: #f0f4ff;
+      border: 2px solid #c8d8ff;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 2px;
+    }
+
+    .poke-slot img {
+      width: 52px;
+      image-rendering: pixelated;
+      animation: slotPop 0.45s ease both;
+    }
+
+    .poke-slot .sname {
+      font-size: 0.58rem;
+      color: #444;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    .poke-slot.empty { opacity: 0.3; }
+    .poke-slot.empty::before { content: '？'; font-size: 1.6rem; color: #aaa; }
+
+    @keyframes slotPop {
+      0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+      70%  { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1)   rotate(0);    opacity: 1; }
+    }
+
+    .restart-btn {
+      font-family: inherit;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 0.75rem;
+      border: 3px solid #1a1a2e;
+      border-radius: 14px;
+      background: #fdcb6e;
+      color: #1a1a2e;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #1a1a2e;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .restart-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #1a1a2e; }
+
+    /* ===== 星エフェクト ===== */
+    .star {
+      position: fixed;
+      pointer-events: none;
+      font-size: 1.6rem;
+      z-index: 200;
+      animation: starFly 1s ease forwards;
+    }
+    @keyframes starFly {
+      0%   { opacity:1; transform: translate(0,0) scale(1.2); }
+      100% { opacity:0; transform: translate(var(--tx), var(--ty)) scale(0.3); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="chip">もんだい <span id="q-num">1</span>/10</div>
+  <div class="chip">🔴 ゲット <span id="got-count">0</span>ひき</div>
+</div>
+
+<!-- クイズ画面 -->
+<div class="game-card" id="quiz-screen">
+  <div class="scene">
+    <span class="cloud" style="top:10px;left:8px">☁️</span>
+    <span class="cloud" style="top:24px;right:12px;font-size:1.3rem">☁️</span>
+    <img id="poke-img" src="" alt="ポケモン">
+    <div class="lv-badge">Lv.<span id="poke-lv">??</span></div>
+    <div id="pokeball">🔴</div>
+  </div>
+  <div class="dialog" id="dialog">よみこみちゅう…⌛</div>
+  <div class="math-area">
+    <div class="formula">
+      <span class="num" id="fa">?</span>
+      <span class="op"  id="fop">＋</span>
+      <span class="num" id="fb">?</span>
+      <span class="sep"> ＝ </span>
+      <span class="q">？</span>
+    </div>
+    <div class="choices" id="choices"></div>
+  </div>
+</div>
+
+<!-- 結果画面 -->
+<div id="result-screen">
+  <div class="result-card">
+    <div class="result-title" id="result-title"></div>
+    <div class="result-sub"   id="result-sub"></div>
+    <div class="collection"   id="collection"></div>
+    <button class="restart-btn" onclick="startGame()">もういちど あそぶ！</button>
+  </div>
+</div>
+
+<script>
+  const TOTAL = 10;
+  let qNum = 0, gotCount = 0;
+  let answerable = false;
+  let curPoke = null;
+  let caught  = [];
+  let cache   = {};
+
+  // ===== PokéAPI =====
+  async function getPoke(id) {
+    if (cache[id]) return cache[id];
+    const [p, s] = await Promise.all([
+      fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r => r.json()),
+      fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`).then(r => r.json())
+    ]);
+    const name =
+      s.names.find(n => n.language.name === 'ja-Hrkt')?.name ||
+      s.names.find(n => n.language.name === 'ja')?.name ||
+      p.name;
+    return cache[id] = { id, name, sprite: p.sprites.front_default };
+  }
+
+  const rand  = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const sleep = ms     => new Promise(r => setTimeout(r, ms));
+
+  // ===== 問題生成 =====
+  function makeQ() {
+    let a, b, op, ans;
+    if (Math.random() < 0.6) {
+      op = '+'; a = rand(1, 9); b = rand(1, 10 - a); ans = a + b;
+    } else {
+      op = '-'; ans = rand(1, 9); b = rand(1, ans); a = ans + b;
+    }
+    return { a, b, op, ans };
+  }
+
+  function makeChoices(ans) {
+    const s = new Set([ans]);
+    while (s.size < 4) s.add(rand(Math.max(1, ans - 4), Math.min(10, ans + 4)));
+    return [...s].sort(() => Math.random() - 0.5);
+  }
+
+  // ===== ゲーム開始 =====
+  function startGame() {
+    qNum = 0; gotCount = 0; caught = [];
+    document.getElementById('result-screen').classList.remove('show');
+    document.getElementById('quiz-screen').style.display = '';
+    document.getElementById('got-count').textContent = 0;
+    nextQ();
+  }
+
+  async function nextQ() {
+    answerable = false;
+    qNum++;
+    document.getElementById('q-num').textContent = qNum;
+    document.getElementById('dialog').textContent = 'よみこみちゅう…⌛';
+    document.getElementById('choices').innerHTML = '';
+
+    const pi = document.getElementById('poke-img');
+    const pb = document.getElementById('pokeball');
+
+    // リセット
+    pi.className = '';
+    pi.src = '';
+    pi.style.display = 'none';
+    pb.style.cssText = 'position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:2.1rem;display:none;pointer-events:none;z-index:10;';
+
+    // ランダムなポケモン取得（第一世代）
+    curPoke = await getPoke(rand(1, 151));
+
+    // ポケモン表示
+    pi.src = curPoke.sprite;
+    pi.style.display = 'block';
+    pi.offsetWidth; // reflow
+    pi.className = 'idle';
+    document.getElementById('poke-lv').textContent = rand(2, 15);
+    document.getElementById('dialog').textContent = `やせいの ${curPoke.name} が あらわれた！`;
+
+    // 計算問題を表示
+    const q = makeQ();
+    document.getElementById('fa').textContent  = q.a;
+    document.getElementById('fop').textContent = q.op === '+' ? '＋' : '－';
+    document.getElementById('fb').textContent  = q.b;
+
+    // 選択肢ボタン
+    makeChoices(q.ans).forEach(v => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = v;
+      btn.onclick = () => onAnswer(btn, v, q.ans);
+      document.getElementById('choices').appendChild(btn);
+    });
+
+    answerable = true;
+  }
+
+  // ===== 回答処理 =====
+  async function onAnswer(btn, val, ans) {
+    if (!answerable) return;
+    answerable = false;
+    document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+    const pi = document.getElementById('poke-img');
+    const pb = document.getElementById('pokeball');
+
+    if (val === ans) {
+      // ===== 正解：ゲット！ =====
+      btn.classList.add('correct');
+      beep(true);
+      document.getElementById('dialog').textContent = 'ポケボールを なげた！';
+
+      // ① ポケボール投げる（CSS transition）
+      pb.style.display = 'block';
+      pb.style.transition = 'none';
+      pb.style.transform  = 'translateX(-50%) translateY(0) rotate(0deg)';
+      pb.offsetWidth; // reflow
+      pb.style.transition = 'transform 0.52s cubic-bezier(0.2,0.8,0.4,1)';
+      pb.style.transform  = 'translateX(-50%) translateY(-100px) rotate(540deg)';
+
+      // ② ポケモンが白く光って消える
+      await sleep(280);
+      pi.className = 'caught';
+
+      // ③ ボールが着地した位置で固定
+      await sleep(580);
+      pb.style.transition = 'none';
+      pb.style.transform  = 'translateX(-50%) translateY(-100px) rotate(0deg)';
+      pb.offsetWidth;
+      document.getElementById('dialog').textContent = '…… …… ……';
+
+      // ④ ボールが3回ゆれる
+      for (let i = 0; i < 3; i++) {
+        await sleep(80);
+        pb.style.transition = 'transform 0.18s ease-in-out';
+        pb.style.transform  = 'translateX(-50%) translateY(-100px) rotate(-28deg)';
+        await sleep(190);
+        pb.style.transform  = 'translateX(-50%) translateY(-100px) rotate(28deg)';
+        await sleep(190);
+        pb.style.transform  = 'translateX(-50%) translateY(-100px) rotate(0deg)';
+        await sleep(120);
+      }
+
+      // ⑤ ゲット確定！
+      pb.style.transition = 'opacity 0.4s';
+      pb.style.opacity    = '0';
+      gotCount++;
+      caught.push(curPoke);
+      document.getElementById('got-count').textContent = gotCount;
+      document.getElementById('dialog').textContent    = `${curPoke.name} を ゲットした！🎉`;
+      spawnStars();
+      await sleep(1300);
+
+    } else {
+      // ===== 不正解：にげられた =====
+      btn.classList.add('wrong');
+      document.querySelectorAll('.choice-btn').forEach(b => {
+        if (parseInt(b.textContent) === ans) b.classList.add('correct');
+      });
+      beep(false);
+      pi.className = 'fled';
+      document.getElementById('dialog').textContent = `${curPoke.name} は にげてしまった！`;
+      await sleep(1700);
+    }
+
+    if (qNum >= TOTAL) showResult();
+    else nextQ();
+  }
+
+  // ===== 結果画面 =====
+  function showResult() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('result-screen').classList.add('show');
+
+    const pct = gotCount / TOTAL;
+    document.getElementById('result-title').textContent =
+      pct === 1   ? '🏆 ぜんぶゲット！さいこう！' :
+      pct >= 0.7  ? '😊 よくできました！'           :
+      pct >= 0.4  ? '👍 もうすこし！がんばれ！'     :
+                    '💪 またちょうせんしよう！';
+    document.getElementById('result-sub').textContent =
+      `10もんちゅう ${gotCount}ひき ゲットしたよ！`;
+
+    const grid = document.getElementById('collection');
+    grid.innerHTML = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const slot = document.createElement('div');
+      if (caught[i]) {
+        slot.className = 'poke-slot';
+        const img = document.createElement('img');
+        img.src = caught[i].sprite;
+        img.alt = caught[i].name;
+        img.style.animationDelay = (i * 0.07) + 's';
+        const nm = document.createElement('div');
+        nm.className = 'sname';
+        nm.textContent = caught[i].name;
+        slot.append(img, nm);
+      } else {
+        slot.className = 'poke-slot empty';
+      }
+      grid.appendChild(slot);
+    }
+  }
+
+  // ===== 効果音 =====
+  function beep(ok) {
+    try {
+      const ctx = new AudioContext();
+      const g   = ctx.createGain();
+      g.connect(ctx.destination);
+      if (ok) {
+        // 正解：上昇メロディ
+        [[523,0],[659,.12],[784,.24],[1047,.38]].forEach(([f, t]) => {
+          const o = ctx.createOscillator();
+          o.connect(g); o.frequency.value = f;
+          g.gain.setValueAtTime(.2, ctx.currentTime + t);
+          g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + t + .16);
+          o.start(ctx.currentTime + t);
+          o.stop(ctx.currentTime + t + .18);
+        });
+      } else {
+        // 不正解：下降音
+        const o = ctx.createOscillator();
+        o.connect(g);
+        o.frequency.value = 220;
+        o.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + .5);
+        g.gain.setValueAtTime(.25, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .55);
+        o.start(); o.stop(ctx.currentTime + .6);
+      }
+    } catch (_) {}
+  }
+
+  // ===== 星エフェクト =====
+  function spawnStars() {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 3;
+    [...'🌟✨⭐💫🌟✨⭐💫'].forEach((em, i) => {
+      const el = document.createElement('div');
+      el.className = 'star';
+      el.textContent = em;
+      const a = (i / 8) * Math.PI * 2;
+      el.style.cssText =
+        `left:${cx}px;top:${cy}px;` +
+        `--tx:${Math.cos(a) * 110}px;` +
+        `--ty:${Math.sin(a) * 85}px;` +
+        `animation-delay:${i * 0.04}s`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1200);
+    });
+  }
+
+  // ===== スタート =====
+  startGame();
+</script>
+</body>
+</html>
