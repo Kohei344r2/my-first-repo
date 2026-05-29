@@ -448,20 +448,6 @@
 
   // ===== Kuroshiro（漢字ふりがな）の初期化 =====
   let kuroshiro = null;
-  let kuroshiroReady = (async () => {
-    try {
-      await Promise.all([
-        loadScript('https://cdn.jsdelivr.net/npm/kuroshiro@1.2.0/dist/kuroshiro.min.js'),
-        loadScript('https://cdn.jsdelivr.net/npm/kuroshiro-analyzer-kuromoji@1.1.0/dist/kuroshiro-analyzer-kuromoji.min.js')
-      ]);
-      kuroshiro = new Kuroshiro();
-      await kuroshiro.init(new KuromojiAnalyzer({
-        dictPath: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/'
-      }));
-    } catch (e) {
-      kuroshiro = null; // 失敗してもアプリは動く
-    }
-  })();
 
   function loadScript(src) {
     return new Promise((resolve, reject) => {
@@ -471,18 +457,36 @@
     });
   }
 
-  // 漢字を含むテキストにルビを振る（Kuroshiro使用）
+  let kuroshiroReady = (async () => {
+    try {
+      // スクリプトを順番に読み込む（並列だと依存関係の問題が起きる場合がある）
+      await loadScript('https://cdn.jsdelivr.net/npm/kuroshiro@1.2.0/dist/kuroshiro.min.js');
+      await loadScript('https://cdn.jsdelivr.net/npm/kuroshiro-analyzer-kuromoji@1.1.0/dist/kuroshiro-analyzer-kuromoji.min.js');
+
+      // グローバル変数名はバンドル形式によって異なる
+      const KuroClass  = (typeof Kuroshiro     !== 'undefined') ? (Kuroshiro.default     || Kuroshiro)     : null;
+      const AnaClass   = (typeof KuromojiAnalyzer !== 'undefined') ? (KuromojiAnalyzer.default || KuromojiAnalyzer) : null;
+      if (!KuroClass || !AnaClass) throw new Error('Kuroshiro classes not found');
+
+      kuroshiro = new KuroClass();
+      await kuroshiro.init(new AnaClass({
+        dictPath: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict'
+      }));
+    } catch (e) {
+      kuroshiro = null; // 失敗してもアプリは動く
+    }
+  })();
+
+  // 漢字を含むテキストにルビを振る
   async function addFurigana(text) {
     if (!text) return '';
-    // 漢字がなければ通常のルビ処理のみ
-    if (!/[一-鿿]/.test(text)) return r(text);
+    if (!/[一-鿿㐀-䶿]/.test(text)) return r(text); // 漢字なし
     await kuroshiroReady;
-    if (!kuroshiro) return r(text); // 初期化失敗時はフォールバック
+    if (!kuroshiro) return r(text); // 失敗時フォールバック
     try {
-      // Kuroshiroで漢字→<ruby>漢字<rt>ふりがな</rt></ruby>に変換
       const html = await kuroshiro.convert(text, { mode: 'furigana', to: 'hiragana' });
-      // 残ったカタカナにもルビを追加
-      return html.replace(/[ァ-ヶー]+/g, m =>
+      // Kuroshiroが出力したrubyタグを保持しつつ、残ったカタカナにもルビを追加
+      return html.replace(/(?<![<>\/])[ァ-ヶー]+(?![^<]*>)/g, m =>
         `<ruby>${m}<rt>${kata2hira(m)}</rt></ruby>`
       );
     } catch (e) {
