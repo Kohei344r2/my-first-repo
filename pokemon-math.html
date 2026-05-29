@@ -433,18 +433,61 @@
       const code = c.charCodeAt(0);
       return (code >= 0x30A1 && code <= 0x30F6)
         ? String.fromCharCode(code - 0x60)
-        : c; // ー などはそのまま
+        : c;
     }).join('');
   }
 
-  // カタカナ・アルファベットにルビを振る
+  // カタカナにひらがなルビを振る（漢字なしテキスト用）
   function r(str) {
     return str
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      // カタカナ連続文字（ーを含む）にひらがなルビ
       .replace(/[ァ-ヶー]+/g, m =>
         `<ruby>${m}<rt>${kata2hira(m)}</rt></ruby>`
       );
+  }
+
+  // ===== Kuroshiro（漢字ふりがな）の初期化 =====
+  let kuroshiro = null;
+  let kuroshiroReady = (async () => {
+    try {
+      await Promise.all([
+        loadScript('https://cdn.jsdelivr.net/npm/kuroshiro@1.2.0/dist/kuroshiro.min.js'),
+        loadScript('https://cdn.jsdelivr.net/npm/kuroshiro-analyzer-kuromoji@1.1.0/dist/kuroshiro-analyzer-kuromoji.min.js')
+      ]);
+      kuroshiro = new Kuroshiro();
+      await kuroshiro.init(new KuromojiAnalyzer({
+        dictPath: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/'
+      }));
+    } catch (e) {
+      kuroshiro = null; // 失敗してもアプリは動く
+    }
+  })();
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src; s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  // 漢字を含むテキストにルビを振る（Kuroshiro使用）
+  async function addFurigana(text) {
+    if (!text) return '';
+    // 漢字がなければ通常のルビ処理のみ
+    if (!/[一-鿿]/.test(text)) return r(text);
+    await kuroshiroReady;
+    if (!kuroshiro) return r(text); // 初期化失敗時はフォールバック
+    try {
+      // Kuroshiroで漢字→<ruby>漢字<rt>ふりがな</rt></ruby>に変換
+      const html = await kuroshiro.convert(text, { mode: 'furigana', to: 'hiragana' });
+      // 残ったカタカナにもルビを追加
+      return html.replace(/[ァ-ヶー]+/g, m =>
+        `<ruby>${m}<rt>${kata2hira(m)}</rt></ruby>`
+      );
+    } catch (e) {
+      return r(text);
+    }
   }
 
   // ===== PokéAPI =====
@@ -494,15 +537,17 @@
   }
 
   // ===== 祝福画面 =====
-  function showCatchScreen(poke) {
+  async function showCatchScreen(poke) {
     document.getElementById('math-area').style.display  = 'none';
     document.getElementById('catch-sprite').src         = poke.sprite;
     document.getElementById('catch-name').innerHTML     = r(poke.name);
-    document.getElementById('catch-genus').innerHTML    = r(poke.genus);
+    document.getElementById('catch-genus').innerHTML    = await addFurigana(poke.genus);
     document.getElementById('catch-height').innerHTML   = `たかさ：${poke.height}<ruby>m<rt>メートル</rt></ruby>`;
     document.getElementById('catch-weight').innerHTML   = `おもさ：${poke.weight}<ruby>kg<rt>キログラム</rt></ruby>`;
-    document.getElementById('catch-desc').innerHTML     = r(poke.flavor) || '（せつめいなし）';
+    document.getElementById('catch-desc').innerHTML     = 'よみこみちゅう…';
     document.getElementById('catch-screen').classList.add('show');
+    // 漢字ふりがな変換（少し時間がかかる場合がある）
+    document.getElementById('catch-desc').innerHTML     = await addFurigana(poke.flavor) || '（せつめいなし）';
   }
 
   function hideCatchScreen() {
@@ -617,7 +662,7 @@
       spawnStars();
 
       await sleep(500);
-      showCatchScreen(curPoke);
+      await showCatchScreen(curPoke);
       await waitForNext();
       hideCatchScreen();
 
