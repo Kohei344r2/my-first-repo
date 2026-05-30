@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ポケモン かたかなゲーム</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Hiragino Maru Gothic ProN', 'Hiragino Maru Gothic Pro', 'Yu Gothic', sans-serif;
+      background: #4a3a7c;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.8rem;
+      gap: 0.6rem;
+    }
+
+    /* ===== スコアバー ===== */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .chip {
+      background: #1a1a2e;
+      color: #fff;
+      border: 3px solid #000;
+      border-radius: 12px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    /* ===== メインカード ===== */
+    .game-card {
+      width: 100%;
+      max-width: 460px;
+      border: 4px solid #1a1a2e;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 5px 5px 0 #1a1a2e;
+    }
+
+    /* ===== バトル画面 ===== */
+    .scene {
+      height: 200px;
+      background: linear-gradient(to bottom,
+        #c084fc 0%, #e9d5ff 50%,
+        #a855f7 50.1%, #7c3aed 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .star-bg {
+      position: absolute;
+      font-size: 1.1rem;
+      opacity: 0.6;
+    }
+
+    #poke-img {
+      position: absolute;
+      width: 110px;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      image-rendering: pixelated;
+      filter: drop-shadow(3px 6px 5px rgba(0,0,0,0.35));
+      display: none;
+    }
+    #poke-img.idle   { animation: bounce 0.7s ease-in-out infinite alternate; }
+    #poke-img.caught { animation: catchAnim 0.85s ease forwards; }
+    #poke-img.fled   { animation: fleeAnim 0.75s ease forwards; }
+
+    @keyframes bounce {
+      from { transform: translateX(-50%) translateY(0); }
+      to   { transform: translateX(-50%) translateY(-9px); }
+    }
+    @keyframes catchAnim {
+      0%   { transform: translateX(-50%) scale(1);   opacity:1; filter:brightness(1); }
+      25%  { transform: translateX(-50%) scale(1.1); opacity:1; filter:brightness(8) saturate(0); }
+      55%  { transform: translateX(-50%) scale(0.6); opacity:0.7; }
+      100% { transform: translateX(-50%) scale(0);   opacity:0; }
+    }
+    @keyframes fleeAnim {
+      0%   { transform: translateX(-50%);  opacity:1; }
+      30%  { transform: translateX(20px);  opacity:1; }
+      100% { transform: translateX(320px); opacity:0; }
+    }
+
+    /* ===== ダイアログ ===== */
+    .dialog {
+      background: #fff;
+      border-top: 4px solid #1a1a2e;
+      padding: 0.75rem 1.1rem;
+      font-size: 1.05rem;
+      font-weight: bold;
+      min-height: 3.4rem;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ===== もんだいエリア ===== */
+    #quiz-area {
+      background: #f5f0ff;
+      border-top: 3px solid #ddd6fe;
+      padding: 0.9rem 1.1rem 0.8rem;
+      text-align: center;
+    }
+
+    .question-label {
+      font-size: 0.85rem;
+      color: #7c3aed;
+      font-weight: bold;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ひらがな大文字表示 */
+    .hira-display {
+      font-size: 5.5rem;
+      font-weight: bold;
+      color: #1a1a2e;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+      text-shadow: 3px 3px 0 rgba(124,58,237,0.2);
+      letter-spacing: 0.05em;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+
+    .choice-btn {
+      font-family: inherit;
+      font-size: 2.8rem;
+      font-weight: bold;
+      padding: 0.5rem;
+      border: 3px solid #1a1a2e;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #1a1a2e;
+      color: #fff;
+      transition: transform 0.1s, box-shadow 0.1s;
+      line-height: 1.1;
+    }
+
+    .choice-btn:nth-child(1) { background: #74b9ff; }
+    .choice-btn:nth-child(2) { background: #a29bfe; }
+    .choice-btn:nth-child(3) { background: #55efc4; color: #1a1a2e; }
+    .choice-btn:nth-child(4) { background: #fd79a8; }
+
+    .choice-btn:hover:not(:disabled)  { transform: translateY(-2px); box-shadow: 0 6px 0 #1a1a2e; }
+    .choice-btn:active:not(:disabled) { transform: translateY(3px);  box-shadow: 0 1px 0 #1a1a2e; }
+    .choice-btn:disabled { cursor: default; }
+
+    .choice-btn.correct { background: #00b894 !important; color: #fff !important;
+                          border-color: #007a61; animation: btnPop 0.3s ease; }
+    .choice-btn.wrong   { background: #d63031 !important; color: #fff !important;
+                          border-color: #900;   animation: btnShake 0.3s ease; }
+
+    @keyframes btnPop   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    @keyframes btnShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+    /* ===== ゲット祝福画面 ===== */
+    #catch-screen {
+      display: none;
+      background: linear-gradient(150deg, #fff9e6 0%, #ffeaa7 50%, #fdcb6e 100%);
+      border-top: 3px solid #e8b800;
+      padding: 1.1rem 1.2rem 1rem;
+      text-align: center;
+      animation: fadeSlideIn 0.35s ease;
+    }
+    #catch-screen.show { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .catch-header {
+      font-size: 1.35rem;
+      font-weight: bold;
+      color: #c0392b;
+      margin-bottom: 0.5rem;
+    }
+
+    .catch-sprite-wrap {
+      margin: 0 auto 0.4rem;
+      width: 120px; height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      border: 3px solid rgba(255,200,0,0.5);
+    }
+
+    #catch-sprite {
+      width: 104px;
+      image-rendering: pixelated;
+      filter: drop-shadow(2px 5px 4px rgba(0,0,0,0.2));
+      animation: catchPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+
+    @keyframes catchPopIn {
+      0%   { transform: scale(0) rotate(-20deg); opacity:0; }
+      60%  { transform: scale(1.18) rotate(5deg); }
+      100% { transform: scale(1) rotate(0); opacity:1; }
+    }
+
+    .catch-name { font-size: 1.8rem; font-weight: bold; color: #1a1a2e; margin: 0.3rem 0 0.1rem; }
+
+    /* かな対応表 */
+    .kana-pair {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(255,255,255,0.75);
+      border-radius: 16px;
+      padding: 0.5rem 1.4rem;
+      margin: 0.4rem 0 0.5rem;
+      font-size: 2.6rem;
+      font-weight: bold;
+    }
+    .kana-pair .hira { color: #7c3aed; }
+    .kana-pair .arrow { color: #aaa; font-size: 1.6rem; }
+    .kana-pair .kata { color: #e17055; }
+
+    .catch-desc {
+      background: rgba(255,255,255,0.7);
+      border-radius: 12px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.88rem;
+      color: #333;
+      line-height: 1.9;
+      text-align: left;
+      margin-bottom: 0.9rem;
+      min-height: 3rem;
+    }
+
+    .next-btn {
+      font-family: inherit;
+      font-size: 1.15rem;
+      font-weight: bold;
+      padding: 0.72rem;
+      width: 100%;
+      border: 3px solid #1a1a2e;
+      border-radius: 14px;
+      background: #1a1a2e;
+      color: #fdcb6e;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.35);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .next-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+
+    /* ===== 結果画面 ===== */
+    #result-screen { display:none; width:100%; max-width:460px; }
+    #result-screen.show { display:block; }
+
+    .result-card {
+      background: #fff;
+      border: 4px solid #1a1a2e;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 5px 5px 0 #1a1a2e;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .result-title { font-size: 1.7rem; text-align: center; }
+    .result-sub   { font-size: 1rem;   text-align: center; color: #636e72; }
+
+    .collection {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
+    }
+
+    .poke-slot {
+      aspect-ratio: 1;
+      background: #f5f0ff;
+      border: 2px solid #ddd6fe;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 2px;
+    }
+    .poke-slot img { width: 52px; image-rendering: pixelated; animation: slotPop 0.45s ease both; }
+    .poke-slot .sname { font-size: 0.52rem; color: #444; text-align: center; line-height: 1.3; }
+    .poke-slot.empty { opacity: 0.3; }
+    .poke-slot.empty::before { content: '？'; font-size: 1.6rem; color: #aaa; }
+
+    @keyframes slotPop {
+      0%   { transform: scale(0) rotate(-20deg); opacity:0; }
+      70%  { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1)   rotate(0);    opacity:1; }
+    }
+
+    .restart-btn {
+      font-family: inherit;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 0.75rem;
+      border: 3px solid #1a1a2e;
+      border-radius: 14px;
+      background: #fdcb6e;
+      color: #1a1a2e;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #1a1a2e;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .restart-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #1a1a2e; }
+
+    /* ===== 星エフェクト ===== */
+    .star {
+      position: fixed;
+      pointer-events: none;
+      font-size: 1.6rem;
+      z-index: 200;
+      animation: starFly 1s ease forwards;
+    }
+    @keyframes starFly {
+      0%   { opacity:1; transform:translate(0,0) scale(1.2); }
+      100% { opacity:0; transform:translate(var(--tx),var(--ty)) scale(0.3); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="chip">もんだい <span id="q-num">1</span>/10</div>
+  <div class="chip">🔴 げっと <span id="got-count">0</span>ひき</div>
+</div>
+
+<!-- クイズ画面 -->
+<div class="game-card" id="quiz-screen">
+
+  <div class="scene">
+    <span class="star-bg" style="top:14px;left:18px">⭐</span>
+    <span class="star-bg" style="top:8px;right:22px;font-size:0.8rem">✨</span>
+    <span class="star-bg" style="top:30px;left:42%">💫</span>
+    <img id="poke-img" src="" alt="ポケモン">
+  </div>
+
+  <div class="dialog" id="dialog">よみこみちゅう…⌛</div>
+
+  <!-- もんだいエリア -->
+  <div id="quiz-area">
+    <div class="question-label">このひらがなと おなじ おとの かたかなは どれ？</div>
+    <div class="hira-display" id="hira-display">？</div>
+    <div class="choices" id="choices"></div>
+  </div>
+
+  <!-- ゲット祝福画面 -->
+  <div id="catch-screen">
+    <div class="catch-header">🎉 げっとだぜ！ 🎉</div>
+    <div class="catch-sprite-wrap">
+      <img id="catch-sprite" src="" alt="ポケモン">
+    </div>
+    <div class="catch-name" id="catch-name"></div>
+    <div class="kana-pair">
+      <span class="hira" id="pair-hira"></span>
+      <span class="arrow">→</span>
+      <span class="kata" id="pair-kata"></span>
+    </div>
+    <div class="catch-desc" id="catch-desc"></div>
+    <button class="next-btn" id="next-btn">つぎのもんだいへ！ →</button>
+  </div>
+
+</div>
+
+<!-- 結果画面 -->
+<div id="result-screen">
+  <div class="result-card">
+    <div class="result-title" id="result-title"></div>
+    <div class="result-sub"   id="result-sub"></div>
+    <div class="collection"   id="collection"></div>
+    <button class="restart-btn" onclick="startGame()">もういちど あそぶ！</button>
+  </div>
+</div>
+
+<script>
+  const TOTAL = 10;
+
+  // ひらがな ↔ カタカナ 対応表（清音＋濁音＋半濁音）
+  const KANA_PAIRS = [
+    ['あ','ア'],['い','イ'],['う','ウ'],['え','エ'],['お','オ'],
+    ['か','カ'],['き','キ'],['く','ク'],['け','ケ'],['こ','コ'],
+    ['さ','サ'],['し','シ'],['す','ス'],['せ','セ'],['そ','ソ'],
+    ['た','タ'],['ち','チ'],['つ','ツ'],['て','テ'],['と','ト'],
+    ['な','ナ'],['に','ニ'],['ぬ','ヌ'],['ね','ネ'],['の','ノ'],
+    ['は','ハ'],['ひ','ヒ'],['ふ','フ'],['へ','ヘ'],['ほ','ホ'],
+    ['ま','マ'],['み','ミ'],['む','ム'],['め','メ'],['も','モ'],
+    ['や','ヤ'],['ゆ','ユ'],['よ','ヨ'],
+    ['ら','ラ'],['り','リ'],['る','ル'],['れ','レ'],['ろ','ロ'],
+    ['わ','ワ'],['を','ヲ'],['ん','ン'],
+    ['が','ガ'],['ぎ','ギ'],['ぐ','グ'],['げ','ゲ'],['ご','ゴ'],
+    ['ざ','ザ'],['じ','ジ'],['ず','ズ'],['ぜ','ゼ'],['ぞ','ゾ'],
+    ['だ','ダ'],['ぢ','ヂ'],['づ','ヅ'],['で','デ'],['ど','ド'],
+    ['ば','バ'],['び','ビ'],['ぶ','ブ'],['べ','ベ'],['ぼ','ボ'],
+    ['ぱ','パ'],['ぴ','ピ'],['ぷ','プ'],['ぺ','ペ'],['ぽ','ポ'],
+  ];
+
+  // 視覚的に紛らわしいペア（間違えやすいもの）
+  const CONFUSABLES = {
+    'ア': ['ア','ウ','エ','オ'],
+    'イ': ['イ','ノ','ニ','ウ'],
+    'ウ': ['ウ','ア','ヲ','ユ'],
+    'エ': ['エ','ア','コ','エ'],
+    'オ': ['オ','ア','ホ','ヲ'],
+    'カ': ['カ','ガ','ヤ','ウ'],
+    'キ': ['キ','ギ','ク','ラ'],
+    'ク': ['ク','グ','ロ','ケ'],
+    'ケ': ['ケ','ゲ','テ','タ'],
+    'コ': ['コ','ゴ','ニ','ユ'],
+    'サ': ['サ','ザ','ス','ナ'],
+    'シ': ['シ','ジ','ツ','ソ'],
+    'ス': ['ス','ズ','ヌ','ス'],
+    'セ': ['セ','ゼ','ヤ','ツ'],
+    'ソ': ['ソ','ゾ','シ','ン'],
+    'タ': ['タ','ダ','ナ','テ'],
+    'チ': ['チ','ヂ','テ','ク'],
+    'ツ': ['ツ','ヅ','シ','ソ'],
+    'テ': ['テ','デ','ナ','タ'],
+    'ト': ['ト','ド','ナ','コ'],
+    'ナ': ['ナ','ダ','メ','テ'],
+    'ニ': ['ニ','ヌ','コ','ミ'],
+    'ヌ': ['ヌ','ス','ミ','フ'],
+    'ネ': ['ネ','ナ','ハ','ホ'],
+    'ノ': ['ノ','イ','ソ','フ'],
+    'ハ': ['ハ','バ','パ','ホ'],
+    'ヒ': ['ヒ','ビ','ピ','ビ'],
+    'フ': ['フ','ブ','プ','ヌ'],
+    'ヘ': ['ヘ','ベ','ペ','ヘ'],
+    'ホ': ['ホ','ボ','ポ','ヲ'],
+    'マ': ['マ','ナ','メ','ヤ'],
+    'ミ': ['ミ','ニ','ヌ','リ'],
+    'ム': ['ム','モ','ラ','ユ'],
+    'メ': ['メ','ナ','マ','ヌ'],
+    'モ': ['モ','ム','コ','ヲ'],
+    'ヤ': ['ヤ','マ','カ','ナ'],
+    'ユ': ['ユ','コ','ウ','ヲ'],
+    'ヨ': ['ヨ','コ','ロ','ラ'],
+    'ラ': ['ラ','ラ','ウ','ナ'],
+    'リ': ['リ','ミ','ニ','イ'],
+    'ル': ['ル','ル','ロ','レ'],
+    'レ': ['レ','ル','ロ','ネ'],
+    'ロ': ['ロ','コ','ヨ','ル'],
+    'ワ': ['ワ','ウ','ヲ','ラ'],
+    'ヲ': ['ヲ','ウ','ワ','ホ'],
+    'ン': ['ン','ソ','ノ','ツ'],
+  };
+
+  // ランダムに4択を作る（紛らわしいものを優先）
+  function makeChoices(kata) {
+    const pool = CONFUSABLES[kata];
+    const allKata = KANA_PAIRS.map(p => p[1]);
+    let choices = new Set([kata]);
+
+    // 紛らわしいもの優先
+    if (pool) {
+      for (const c of pool) {
+        if (c !== kata && choices.size < 4) choices.add(c);
+      }
+    }
+    // 足りなければランダム補充
+    while (choices.size < 4) {
+      choices.add(allKata[Math.floor(Math.random() * allKata.length)]);
+    }
+    return [...choices].sort(() => Math.random() - 0.5);
+  }
+
+  // カタカナ → ひらがな
+  function kata2hira(s) {
+    return [...s].map(c => {
+      const code = c.charCodeAt(0);
+      return (code >= 0x30A1 && code <= 0x30F6)
+        ? String.fromCharCode(code - 0x60) : c;
+    }).join('');
+  }
+
+  // ===== PokéAPI =====
+  let cache = {};
+  async function getPoke(id) {
+    if (cache[id]) return cache[id];
+    const [p, s] = await Promise.all([
+      fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r => r.json()),
+      fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`).then(r => r.json())
+    ]);
+    const nameEntry =
+      s.names.find(n => n.language.name === 'ja-Hrkt') ||
+      s.names.find(n => n.language.name === 'ja');
+    const name = nameEntry ? nameEntry.name : p.name;
+    const allFlavors = s.flavor_text_entries;
+    const flavorHrkt = allFlavors.find(f => f.language.name === 'ja-Hrkt');
+    const flavorJa   = allFlavors.filter(f => f.language.name === 'ja').pop();
+    const rawFlavor  = (flavorHrkt || flavorJa)?.flavor_text || '';
+    const flavor     = kata2hira(rawFlavor.replace(/[\f\n\r]/g, ' '));
+    const nameHira   = kata2hira(name);
+    return cache[id] = { id, name, nameHira, sprite: p.sprites.front_default, flavor };
+  }
+
+  const rand  = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+  let qNum = 0, gotCount = 0;
+  let answerable = false;
+  let curPoke = null;
+  let curHira = '', curKata = '';
+  let caught  = [];
+
+  // 出題済みひらがな（1ゲーム内で重複なし）
+  let usedIndices = [];
+
+  function pickKanaPair() {
+    if (usedIndices.length >= KANA_PAIRS.length) usedIndices = [];
+    let idx;
+    do { idx = rand(0, KANA_PAIRS.length - 1); }
+    while (usedIndices.includes(idx));
+    usedIndices.push(idx);
+    return KANA_PAIRS[idx];
+  }
+
+  // ===== ゲーム開始 =====
+  function startGame() {
+    qNum = 0; gotCount = 0; caught = []; usedIndices = [];
+    document.getElementById('result-screen').classList.remove('show');
+    document.getElementById('quiz-screen').style.display = '';
+    document.getElementById('got-count').textContent = 0;
+    hideCatchScreen();
+    nextQ();
+  }
+
+  async function nextQ() {
+    answerable = false;
+    qNum++;
+    document.getElementById('q-num').textContent  = qNum;
+    document.getElementById('dialog').textContent = 'よみこみちゅう…⌛';
+    document.getElementById('choices').innerHTML  = '';
+    document.getElementById('hira-display').textContent = '？';
+
+    const pi = document.getElementById('poke-img');
+    pi.className = '';
+    pi.src = '';
+    pi.style.display = 'none';
+
+    // ポケモンとかな問題を並行取得
+    const [pair, poke] = await Promise.all([
+      Promise.resolve(pickKanaPair()),
+      getPoke(rand(1, 151))
+    ]);
+
+    [curHira, curKata] = pair;
+    curPoke = poke;
+
+    pi.src = curPoke.sprite;
+    pi.style.display = 'block';
+    pi.offsetWidth;
+    pi.className = 'idle';
+
+    document.getElementById('hira-display').textContent = curHira;
+    document.getElementById('dialog').textContent =
+      `「${curHira}」と おなじ おとの かたかなは どれ？`;
+
+    makeChoices(curKata).forEach(v => {
+      const btn = document.createElement('button');
+      btn.className   = 'choice-btn';
+      btn.textContent = v;
+      btn.onclick     = () => onAnswer(btn, v, curKata);
+      document.getElementById('choices').appendChild(btn);
+    });
+
+    answerable = true;
+  }
+
+  // ===== 回答処理 =====
+  async function onAnswer(btn, val, ans) {
+    if (!answerable) return;
+    answerable = false;
+    document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+    const pi = document.getElementById('poke-img');
+
+    if (val === ans) {
+      btn.classList.add('correct');
+      beep(true);
+      document.getElementById('dialog').textContent =
+        `せいかい！「${curHira}」は「${curKata}」だよ！🎉`;
+      pi.className = 'caught';
+      gotCount++;
+      caught.push({ ...curPoke, hira: curHira, kata: curKata });
+      document.getElementById('got-count').textContent = gotCount;
+      spawnStars();
+
+      await sleep(800);
+      await showCatchScreen(curPoke, curHira, curKata);
+      await waitForNext();
+      hideCatchScreen();
+
+    } else {
+      btn.classList.add('wrong');
+      document.querySelectorAll('.choice-btn').forEach(b => {
+        if (b.textContent === ans) b.classList.add('correct');
+      });
+      beep(false);
+      document.getElementById('dialog').textContent =
+        `ざんねん！「${curHira}」は「${curKata}」だよ！`;
+      pi.className = 'fled';
+      await sleep(1800);
+    }
+
+    if (qNum >= TOTAL) showResult();
+    else nextQ();
+  }
+
+  // ===== 祝福画面 =====
+  async function showCatchScreen(poke, hira, kata) {
+    document.getElementById('quiz-area').style.display   = 'none';
+    document.getElementById('catch-sprite').src          = poke.sprite;
+    document.getElementById('catch-name').textContent    = poke.nameHira;
+    document.getElementById('pair-hira').textContent     = hira;
+    document.getElementById('pair-kata').textContent     = kata;
+    document.getElementById('catch-desc').textContent    = poke.flavor || '（せつめいなし）';
+    document.getElementById('catch-screen').classList.add('show');
+  }
+
+  function hideCatchScreen() {
+    document.getElementById('catch-screen').classList.remove('show');
+    document.getElementById('quiz-area').style.display = '';
+  }
+
+  function waitForNext() {
+    return new Promise(resolve => {
+      document.getElementById('next-btn').onclick = resolve;
+    });
+  }
+
+  // ===== 結果画面 =====
+  function showResult() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('result-screen').classList.add('show');
+
+    const pct = gotCount / TOTAL;
+    document.getElementById('result-title').textContent =
+      pct === 1   ? '🏆 ぜんもん せいかい！さいこう！' :
+      pct >= 0.7  ? '😊 よくできました！'              :
+      pct >= 0.4  ? '👍 もうすこし！がんばれ！'        :
+                    '💪 またちょうせんしよう！';
+    document.getElementById('result-sub').textContent =
+      `10もんちゅう ${gotCount}もん せいかい！`;
+
+    const grid = document.getElementById('collection');
+    grid.innerHTML = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const slot = document.createElement('div');
+      if (caught[i]) {
+        slot.className = 'poke-slot';
+        const img = document.createElement('img');
+        img.src = caught[i].sprite;
+        img.style.animationDelay = (i * 0.07) + 's';
+        const nm = document.createElement('div');
+        nm.className = 'sname';
+        nm.textContent = caught[i].nameHira;
+        slot.append(img, nm);
+      } else {
+        slot.className = 'poke-slot empty';
+      }
+      grid.appendChild(slot);
+    }
+  }
+
+  // ===== 効果音 =====
+  function beep(ok) {
+    try {
+      const ctx = new AudioContext();
+      const g   = ctx.createGain();
+      g.connect(ctx.destination);
+      if (ok) {
+        [[523,0],[659,.12],[784,.24],[1047,.38]].forEach(([f, t]) => {
+          const o = ctx.createOscillator();
+          o.connect(g); o.frequency.value = f;
+          g.gain.setValueAtTime(.2, ctx.currentTime + t);
+          g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + t + .16);
+          o.start(ctx.currentTime + t);
+          o.stop(ctx.currentTime + t + .18);
+        });
+      } else {
+        const o = ctx.createOscillator();
+        o.connect(g);
+        o.frequency.value = 220;
+        o.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + .5);
+        g.gain.setValueAtTime(.25, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .55);
+        o.start(); o.stop(ctx.currentTime + .6);
+      }
+    } catch (_) {}
+  }
+
+  // ===== 星エフェクト =====
+  function spawnStars() {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 3;
+    [...'🌟✨⭐💫🌟✨⭐💫'].forEach((em, i) => {
+      const el = document.createElement('div');
+      el.className = 'star';
+      el.textContent = em;
+      const a = (i / 8) * Math.PI * 2;
+      el.style.cssText =
+        `left:${cx}px;top:${cy}px;` +
+        `--tx:${Math.cos(a)*110}px;--ty:${Math.sin(a)*85}px;` +
+        `animation-delay:${i*0.04}s`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1200);
+    });
+  }
+
+  startGame();
+</script>
+</body>
+</html>
