@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ポケモン ぬりえ</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Hiragino Maru Gothic ProN', 'Hiragino Maru Gothic Pro', 'Yu Gothic', sans-serif;
+      background: #4a3a7c;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.8rem;
+      gap: 0.6rem;
+    }
+
+    /* ===== トップバー ===== */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 460px;
+    }
+    .chip {
+      background: #1a1a2e;
+      color: #fff;
+      border: 3px solid #000;
+      border-radius: 12px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    /* ===== メインカード ===== */
+    .game-card {
+      width: 100%;
+      max-width: 460px;
+      border: 4px solid #1a1a2e;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 5px 5px 0 #1a1a2e;
+    }
+
+    /* ===== ダイアログ ===== */
+    .dialog {
+      background: #fff;
+      border-bottom: 4px solid #1a1a2e;
+      padding: 0.75rem 1.1rem;
+      font-size: 1.05rem;
+      font-weight: bold;
+      min-height: 3.4rem;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ===== ぬりえエリア ===== */
+    #paint-area {
+      background: #f5f0ff;
+      padding: 0.8rem 0.8rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    /* しんちょくバー */
+    .progress-wrap {
+      width: 100%;
+      background: #ddd6fe;
+      border-radius: 99px;
+      border: 2px solid #1a1a2e;
+      height: 22px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #a855f7, #ec4899);
+      border-radius: 99px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* キャンバス */
+    #color-canvas {
+      border: 3px solid #1a1a2e;
+      border-radius: 16px;
+      cursor: crosshair;
+      touch-action: none;
+      box-shadow: 3px 3px 0 #1a1a2e;
+      background: repeating-conic-gradient(#e2e8f0 0% 25%, #fff 0% 50%) 0 0 / 16px 16px;
+      display: block;
+      max-width: 100%;
+    }
+
+    /* カラーパレット */
+    .palette-label {
+      font-size: 0.85rem;
+      color: #7c3aed;
+      font-weight: bold;
+    }
+    .palette {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .color-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 3px solid #1a1a2e;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #1a1a2e;
+      transition: transform 0.1s, box-shadow 0.1s;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .color-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1a1a2e; }
+    .color-btn.selected {
+      transform: scale(1.2);
+      box-shadow: 0 4px 0 #1a1a2e, 0 0 0 3px #fff, 0 0 0 6px #7c3aed;
+    }
+    .erase-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 3px solid #1a1a2e;
+      cursor: pointer;
+      background: #fff;
+      font-size: 1.25rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 0 #1a1a2e;
+      transition: transform 0.1s, box-shadow 0.1s;
+      flex-shrink: 0;
+    }
+    .erase-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1a1a2e; }
+    .erase-btn.selected {
+      transform: scale(1.2);
+      box-shadow: 0 4px 0 #1a1a2e, 0 0 0 3px #fff, 0 0 0 6px #7c3aed;
+    }
+
+    /* ===== ゲット祝福画面 ===== */
+    #catch-screen {
+      display: none;
+      background: linear-gradient(150deg, #fff9e6 0%, #ffeaa7 50%, #fdcb6e 100%);
+      border-top: 3px solid #e8b800;
+      padding: 1.1rem 1.2rem 1rem;
+      text-align: center;
+      animation: fadeSlideIn 0.35s ease;
+    }
+    #catch-screen.show { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .catch-header { font-size: 1.35rem; font-weight: bold; color: #c0392b; margin-bottom: 0.5rem; }
+    .catch-sprite-wrap {
+      margin: 0 auto 0.4rem;
+      width: 130px; height: 130px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      border: 3px solid rgba(255,200,0,0.5);
+    }
+    #catch-sprite {
+      width: 112px;
+      image-rendering: pixelated;
+      filter: drop-shadow(2px 5px 4px rgba(0,0,0,0.2));
+      animation: catchPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+    @keyframes catchPopIn {
+      0%   { transform: scale(0) rotate(-20deg); opacity:0; }
+      60%  { transform: scale(1.18) rotate(5deg); }
+      100% { transform: scale(1) rotate(0); opacity:1; }
+    }
+    .catch-name { font-size: 1.8rem; font-weight: bold; color: #1a1a2e; margin: 0.3rem 0 0.1rem; }
+    .catch-desc {
+      background: rgba(255,255,255,0.7);
+      border-radius: 12px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.9rem;
+      color: #333;
+      line-height: 1.9;
+      text-align: left;
+      margin: 0.4rem 0 0.9rem;
+    }
+    .next-btn {
+      font-family: inherit;
+      font-size: 1.15rem;
+      font-weight: bold;
+      padding: 0.72rem;
+      width: 100%;
+      border: 3px solid #1a1a2e;
+      border-radius: 14px;
+      background: #1a1a2e;
+      color: #fdcb6e;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.35);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .next-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+
+    /* ===== ローディング ===== */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 3rem 2rem;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .poke-ball-spin {
+      width: 60px; height: 60px;
+      border: 6px solid #fff;
+      border-top-color: #f00;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== 紙吹雪 ===== */
+    .confetti {
+      position: fixed;
+      width: 12px; height: 12px;
+      border-radius: 2px;
+      top: -20px;
+      animation: confettiFall linear forwards;
+      pointer-events: none;
+      z-index: 100;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="poke-ball-spin"></div>
+  <div>ポケモンを よんでいるよ…</div>
+</div>
+
+<div id="game-wrap" style="display:none; width:100%; max-width:460px; flex-direction:column; align-items:center; gap:0.6rem;">
+
+  <div class="top-bar">
+    <div class="chip" id="poke-count">🎨 ゲット：0ひき</div>
+    <div class="chip" id="fill-pct">0% ぬれた</div>
+  </div>
+
+  <div class="game-card">
+    <div class="dialog" id="dialog-text">ぬりえをはじめよう！</div>
+
+    <div id="paint-area">
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <canvas id="color-canvas"></canvas>
+      <div class="palette-label">いろをえらんで クリック！</div>
+      <div class="palette" id="palette"></div>
+    </div>
+
+    <div id="catch-screen">
+      <div class="catch-header">✨ ポケモンを ゲット！ ✨</div>
+      <div class="catch-sprite-wrap">
+        <img id="catch-sprite" src="" alt="">
+      </div>
+      <div class="catch-name" id="catch-name"></div>
+      <div class="catch-desc"  id="catch-desc"></div>
+      <button class="next-btn" id="next-btn">つぎのポケモンをぬろう！ →</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="hidden-canvas" style="display:none"></canvas>
+
+<script>
+// ===== カラーパレット =====
+const PALETTE = [
+  '#ef4444','#f97316','#facc15','#4ade80',
+  '#60a5fa','#a78bfa','#f472b6','#2dd4bf',
+  '#fb923c','#a3e635','#38bdf8','#e879f9',
+  '#fbbf24','#f9a8d4','#86efac','#93c5fd',
+];
+
+// 未塗り色（薄ラベンダー）・透明・ライン色
+const UNFILLED  = 0;           // 特別値：未塗りフラグ（colorBuf専用）
+const ERASED    = 1;           // 消しゴム後（＝未塗り扱い）
+const LINE_R=30, LINE_G=20, LINE_B=50; // 線画の色
+
+const W = 280, H = 280;
+
+const hCanvas = document.getElementById('hidden-canvas');
+const hCtx    = hCanvas.getContext('2d');
+hCanvas.width = W; hCanvas.height = H;
+
+const canvas = document.getElementById('color-canvas');
+const ctx    = canvas.getContext('2d');
+canvas.width  = W;
+canvas.height = H;
+
+// lineMask[i] = 1: 線画ピクセル（不変）
+// insideMask[i] = 1: ポケモン内部（塗れる）
+// colorBuf[i] = 0(未塗り) or 0xRRGGBBAA(塗り済み)
+let lineMask     = null;
+let insideMask   = null;
+let colorBuf     = null; // Uint32Array – RGBA packed
+let fillableTotal = 0;
+let filledCount   = 0;
+let selectedHex   = PALETTE[0];
+let gotCount      = 0;
+let currentPoke   = null;
+let busy          = false;
+let caught        = false;
+
+// ===== 色変換 =====
+function hexToU32(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return (255<<24)|(b<<16)|(g<<8)|r;
+}
+function rgba(r,g,b,a=255) {
+  return ((a&0xFF)<<24)|((b&0xFF)<<16)|((g&0xFF)<<8)|(r&0xFF);
+}
+// 未塗りエリアの表示色（エリアごとに微妙に違う薄い色でも良いが、まずラベンダーで統一）
+const UNFILLED_COLOR = rgba(230,225,250,255); // 薄ラベンダー
+
+// ===== パレット生成 =====
+function buildPalette() {
+  const p = document.getElementById('palette');
+  p.innerHTML = '';
+  PALETTE.forEach((hex, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'color-btn' + (i === 0 ? ' selected' : '');
+    btn.style.background = hex;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.color-btn,.erase-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedHex = hex;
+    });
+    p.appendChild(btn);
+  });
+  const eb = document.createElement('button');
+  eb.className = 'erase-btn';
+  eb.textContent = '🧽';
+  eb.addEventListener('click', () => {
+    document.querySelectorAll('.color-btn,.erase-btn').forEach(b => b.classList.remove('selected'));
+    eb.classList.add('selected');
+    selectedHex = null; // null = 消す
+  });
+  p.appendChild(eb);
+}
+
+// ===== ポケモン取得 =====
+async function loadPokemon() {
+  caught = false;
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('game-wrap').style.display = 'none';
+  document.getElementById('catch-screen').classList.remove('show');
+  document.getElementById('paint-area').style.display = 'flex';
+
+  const id = Math.floor(Math.random() * 151) + 1;
+  const [pokeRes, specRes] = await Promise.all([
+    fetch(`https://pokeapi.co/api/v2/pokemon/${id}`),
+    fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`)
+  ]);
+  const pokeData = await pokeRes.json();
+  const specData = await specRes.json();
+
+  const artUrl    = pokeData.sprites.other['official-artwork'].front_default
+                 || pokeData.sprites.front_default;
+  const spriteUrl = pokeData.sprites.front_default;
+  const nameJa    = specData.names.find(n => n.language.name === 'ja-Hrkt')?.name
+                 || specData.names.find(n => n.language.name === 'ja')?.name
+                 || pokeData.name;
+  const flavor    = (specData.flavor_text_entries.find(f => f.language.name === 'ja')?.flavor_text || '')
+                      .replace(/[\f\n\r­]/g, '');
+
+  currentPoke = { artUrl, spriteUrl, nameJa, flavor };
+  await buildLineArt(artUrl);
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('game-wrap').style.display = 'flex';
+  document.getElementById('dialog-text').textContent = `「${nameJa}」を ぬりえしよう！`;
+  updateProgress();
+}
+
+// ===== 線画生成（エッジ検出 + 膨張） =====
+function buildLineArt(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      hCtx.clearRect(0, 0, W, H);
+      const margin = 14;
+      const s  = Math.min((W - margin*2) / img.width, (H - margin*2) / img.height);
+      const dw = img.width * s, dh = img.height * s;
+      const dx = (W - dw) / 2,  dy = (H - dh) / 2;
+      hCtx.drawImage(img, dx, dy, dw, dh);
+
+      const src = new Uint32Array(hCtx.getImageData(0, 0, W, H).data.buffer);
+
+      const N   = W * H;
+      lineMask   = new Uint8Array(N);
+      insideMask = new Uint8Array(N);
+      colorBuf   = new Uint32Array(N); // 0 = 未塗り
+      fillableTotal = 0;
+      filledCount   = 0;
+
+      const getA = i => (src[i] >>> 24) & 0xFF;
+      const getR = i =>  src[i]         & 0xFF;
+      const getG = i => (src[i] >>> 8)  & 0xFF;
+      const getB = i => (src[i] >>> 16) & 0xFF;
+      const diff = (i, j) =>
+        Math.abs(getR(i)-getR(j)) + Math.abs(getG(i)-getG(j)) + Math.abs(getB(i)-getB(j));
+
+      // --- パス1: 透明外周・内部の初期分類 ---
+      const rawEdge = new Uint8Array(N);
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const i = y * W + x;
+          if (getA(i) < 25) continue; // 完全透明
+          insideMask[i] = 1;
+
+          let edge = false;
+          const ns = [
+            x>0   ? i-1 : -1, x<W-1 ? i+1 : -1,
+            y>0   ? i-W : -1, y<H-1 ? i+W : -1,
+          ];
+          for (const ni of ns) {
+            if (ni === -1 || getA(ni) < 25 || diff(i, ni) > 45) { edge = true; break; }
+          }
+          if (edge) rawEdge[i] = 1;
+        }
+      }
+
+      // --- パス2: エッジを1px膨張（太い輪郭線に） ---
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const i = y * W + x;
+          if (!insideMask[i]) continue;
+          if (rawEdge[i]) { lineMask[i] = 1; continue; }
+          const ns = [
+            x>0   ? i-1 : -1, x<W-1 ? i+1 : -1,
+            y>0   ? i-W : -1, y<H-1 ? i+W : -1,
+          ];
+          for (const ni of ns) {
+            if (ni !== -1 && rawEdge[ni]) { lineMask[i] = 1; break; }
+          }
+        }
+      }
+
+      // --- パス3: fillableTotal カウント ---
+      for (let i = 0; i < N; i++) {
+        if (insideMask[i] && !lineMask[i]) fillableTotal++;
+      }
+
+      renderCanvas();
+      resolve();
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+// ===== 描画（色レイヤー → 線画を常に上書き） =====
+function renderCanvas() {
+  const imgData = ctx.createImageData(W, H);
+  const dst     = new Uint32Array(imgData.data.buffer);
+
+  for (let i = 0; i < W * H; i++) {
+    if (!insideMask[i]) { dst[i] = 0; continue; }       // 透明（外側）
+    if (lineMask[i])    { dst[i] = rgba(LINE_R,LINE_G,LINE_B); continue; } // 線画（常に最前面）
+    // 塗りエリア
+    dst[i] = colorBuf[i] !== 0 ? colorBuf[i] : UNFILLED_COLOR;
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+// ===== BFS フラッドフィル =====
+function floodFill(sx, sy) {
+  if (sx < 0 || sx >= W || sy < 0 || sy >= H) return;
+  const si = sy * W + sx;
+  if (!insideMask[si] || lineMask[si]) return; // 線・外側はスキップ
+
+  const fillColor  = selectedHex ? hexToU32(selectedHex) : 0; // 0=未塗りに戻す
+  const targetColor = colorBuf[si];
+  if (targetColor === fillColor) return;
+
+  const queue   = [si];
+  const visited = new Uint8Array(W * H);
+  visited[si]   = 1;
+
+  while (queue.length > 0) {
+    const idx = queue.pop();
+
+    // filledCount 更新
+    const wasColored = colorBuf[idx] !== 0;
+    const willColor  = fillColor !== 0;
+    if (!wasColored && willColor)  filledCount++;
+    if (wasColored  && !willColor) filledCount = Math.max(0, filledCount - 1);
+
+    colorBuf[idx] = fillColor;
+
+    const cx = idx % W, cy = (idx / W) | 0;
+    const ns = [
+      cx > 0   ? idx-1 : -1,
+      cx < W-1 ? idx+1 : -1,
+      cy > 0   ? idx-W : -1,
+      cy < H-1 ? idx+W : -1,
+    ];
+    for (const ni of ns) {
+      if (ni === -1 || visited[ni]) continue;
+      if (!insideMask[ni] || lineMask[ni]) continue;
+      if (colorBuf[ni] !== targetColor) continue;
+      visited[ni] = 1;
+      queue.push(ni);
+    }
+  }
+}
+
+// ===== しんちょく =====
+function updateProgress() {
+  const pct = fillableTotal === 0 ? 0 : Math.round(filledCount / fillableTotal * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('fill-pct').textContent = pct + '% ぬれた';
+
+  if      (pct === 0) document.getElementById('dialog-text').textContent = `すきないろで ぬってみてね！`;
+  else if (pct < 40)  document.getElementById('dialog-text').textContent = `いいね！ どんどん ぬろう！`;
+  else if (pct < 70)  document.getElementById('dialog-text').textContent = `すごい！ もっとぬれるよ！`;
+  else if (pct < 92)  document.getElementById('dialog-text').textContent = `あともうすこし！`;
+  else if (pct < 100) document.getElementById('dialog-text').textContent = `のこりわずか！`;
+
+  if (pct >= 95 && !caught) triggerCatch();
+}
+
+// ===== ゲット演出 =====
+function triggerCatch() {
+  caught = true;
+  document.getElementById('paint-area').style.display = 'none';
+  document.getElementById('catch-screen').classList.add('show');
+  document.getElementById('catch-sprite').src          = currentPoke.spriteUrl;
+  document.getElementById('catch-name').textContent    = currentPoke.nameJa;
+  document.getElementById('catch-desc').textContent    = currentPoke.flavor || '…';
+  gotCount++;
+  document.getElementById('poke-count').textContent    = `🎨 ゲット：${gotCount}ひき`;
+  document.getElementById('dialog-text').textContent   = `✨ ${currentPoke.nameJa} を ゲット！`;
+  launchConfetti();
+}
+
+// ===== 紙吹雪 =====
+function launchConfetti() {
+  const colors = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#a855f7','#ec4899'];
+  for (let i = 0; i < 70; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.background = colors[i % colors.length];
+    el.style.animationDuration = (1.2 + Math.random() * 2) + 's';
+    el.style.animationDelay    = (Math.random() * 0.9) + 's';
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+}
+
+// ===== イベント =====
+function handleClick(clientX, clientY) {
+  if (busy || caught) return;
+  busy = true;
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((clientX - rect.left) * W / rect.width);
+  const y = Math.floor((clientY - rect.top)  * H / rect.height);
+  floodFill(x, y);
+  renderCanvas();
+  updateProgress();
+  busy = false;
+}
+
+canvas.addEventListener('click', e => handleClick(e.clientX, e.clientY));
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  const t = e.changedTouches[0];
+  handleClick(t.clientX, t.clientY);
+}, { passive: false });
+
+document.getElementById('next-btn').addEventListener('click', loadPokemon);
+
+// ===== 起動 =====
+buildPalette();
+loadPokemon();
+</script>
+</body>
+</html>
