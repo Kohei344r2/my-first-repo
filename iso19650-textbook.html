@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISO 19650 学習テキスト — 建設情報マネジメントの国際規格</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f4f5f2;
+  --sheet:#fdfdfb;
+  --ink:#22303a;
+  --ink-soft:#5c6b77;
+  --line:#c9cfc9;
+  --frame:#39434b;
+  --stamp:#1d5fa0;         /* 審査印ブルー */
+  --stamp-soft:#e3ecf6;
+  --wip:#b97b0e;           /* CDE: 作業中 */
+  --shared:#1d5fa0;        /* CDE: 共有 */
+  --published:#0b6e4f;     /* CDE: 公開 */
+  --archived:#5c6b77;      /* CDE: アーカイブ */
+  --hl:#fff7e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN',sans-serif;
+  font-size:15.5px;
+  line-height:1.85;
+  padding:28px 14px 64px;
+}
+.sheet{
+  max-width:880px;margin:0 auto;background:var(--sheet);
+  border:1.5px solid var(--frame);
+  outline:1px solid var(--frame);
+  outline-offset:4px;
+  padding:0;
+}
+/* ===== 図面タイトルブロック ===== */
+.titleblock{
+  border-bottom:1.5px solid var(--frame);
+  display:grid;grid-template-columns:1fr auto;
+}
+.titleblock .main{padding:34px 36px 26px}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;
+  color:var(--stamp);text-transform:uppercase;margin-bottom:10px;
+}
+h1{
+  font-family:'Zen Old Mincho',serif;font-weight:900;font-size:clamp(26px,4.6vw,40px);
+  line-height:1.35;letter-spacing:.02em;
+}
+.subtitle{color:var(--ink-soft);margin-top:10px;font-size:14.5px}
+.meta{
+  border-left:1.5px solid var(--frame);
+  display:flex;flex-direction:column;min-width:190px;
+}
+.meta div{
+  padding:10px 16px;border-bottom:1px solid var(--line);
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);
+}
+.meta div:last-child{border-bottom:none}
+.meta b{display:block;color:var(--ink);font-size:12.5px;margin-top:2px;font-weight:600}
+@media(max-width:640px){
+  .titleblock{grid-template-columns:1fr}
+  .meta{border-left:none;border-top:1.5px solid var(--frame);flex-direction:row;flex-wrap:wrap}
+  .meta div{flex:1 1 40%;border-right:1px solid var(--line)}
+}
+/* ===== 目次 ===== */
+.toc{padding:26px 36px;border-bottom:1.5px solid var(--frame);background:var(--stamp-soft)}
+.toc h2{font-family:'Zen Old Mincho',serif;font-size:17px;margin-bottom:12px}
+.toc ol{list-style:none;columns:2;column-gap:36px}
+@media(max-width:640px){.toc ol{columns:1}}
+.toc li{margin-bottom:6px;font-size:14px;break-inside:avoid}
+.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--stamp)}
+.toc a:hover{color:var(--stamp)}
+.toc .no{font-family:'IBM Plex Mono',monospace;color:var(--stamp);font-size:12px;margin-right:8px}
+/* ===== 章 ===== */
+section{padding:44px 36px 26px;border-bottom:1px solid var(--line)}
+@media(max-width:640px){section{padding:36px 20px 20px}}
+.ch-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.ch-no{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;
+  color:#fff;background:var(--stamp);padding:3px 10px;white-space:nowrap;
+}
+h2.ch-title{font-family:'Zen Old Mincho',serif;font-weight:900;font-size:23px;line-height:1.5}
+.ch-goal{
+  font-size:13.5px;color:var(--ink-soft);margin:8px 0 22px;
+  padding-left:12px;border-left:3px solid var(--stamp);
+}
+h3{
+  font-family:'Zen Old Mincho',serif;font-size:17.5px;margin:30px 0 10px;
+  padding-bottom:5px;border-bottom:1px solid var(--line);
+}
+h3 .sec{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--stamp);margin-right:8px}
+p{margin-bottom:14px}
+em{font-style:normal;background:var(--hl);padding:0 3px}
+strong{font-weight:700}
+/* 用語ボックス */
+.term{
+  border:1px solid var(--stamp);background:var(--stamp-soft);
+  padding:14px 18px;margin:18px 0;font-size:14px;
+}
+.term .t-label{
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.15em;
+  color:var(--stamp);display:block;margin-bottom:6px;
+}
+.term dt{font-weight:700;margin-top:8px}
+.term dd{margin-left:0;color:var(--ink)}
+/* 注意・ポイント */
+.point{
+  background:var(--hl);border-left:4px solid var(--wip);
+  padding:12px 16px;margin:18px 0;font-size:14px;
+}
+.point .p-label{font-weight:700;color:var(--wip);font-size:12.5px;letter-spacing:.08em;display:block;margin-bottom:4px}
+/* 図 */
+figure{margin:24px 0 28px;border:1px solid var(--line);background:#fff;padding:18px 14px 10px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{
+  font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);
+  border-top:1px solid var(--line);margin-top:12px;padding-top:8px;
+}
+figcaption b{color:var(--stamp);font-weight:600;margin-right:8px}
+/* テーブル */
+table{width:100%;border-collapse:collapse;margin:16px 0 22px;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--stamp-soft);font-weight:700;font-size:12.5px;white-space:nowrap}
+td .mono,th .mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+/* チェック問題 */
+details{border:1px solid var(--line);margin-bottom:10px;background:#fff}
+summary{cursor:pointer;padding:12px 16px;font-weight:500;font-size:14px;list-style:none}
+summary::before{content:"Q ";font-family:'IBM Plex Mono',monospace;color:var(--stamp);font-weight:600}
+details[open] summary{border-bottom:1px solid var(--line);background:var(--stamp-soft)}
+details .ans{padding:12px 16px;font-size:14px}
+details .ans::before{content:"A. ";font-family:'IBM Plex Mono',monospace;color:var(--published);font-weight:600}
+footer{padding:22px 36px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft)}
+.small{font-size:12.5px;color:var(--ink-soft)}
+ul.plain{margin:0 0 14px 1.3em}
+ul.plain li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<!-- ============ タイトルブロック ============ -->
+<div class="titleblock">
+  <div class="main">
+    <div class="eyebrow">TEXTBOOK — INFORMATION MANAGEMENT / BIM</div>
+    <h1>ISO 19650 学習テキスト<br>建設情報マネジメントの国際規格</h1>
+    <p class="subtitle">BS 1192の系譜から、要求事項の階層・CDE・納品計画、そして日本の請負構造への適用まで</p>
+  </div>
+  <div class="meta">
+    <div>DOC NO.<b>ISO19650-STUDY-01</b></div>
+    <div>REV.<b>A / 2026-07</b></div>
+    <div>STATUS<b>S4 — 学習用</b></div>
+    <div>SHEETS<b>全11章</b></div>
+  </div>
+</div>
+
+<!-- ============ 目次 ============ -->
+<nav class="toc">
+  <h2>目次 — 学習マップ</h2>
+  <ol>
+    <li><span class="no">CH.01</span><a href="#ch1">ISO 19650とは何か — 系譜と本質</a></li>
+    <li><span class="no">CH.02</span><a href="#ch2">規格ファミリーの全体像(Part 1〜6)</a></li>
+    <li><span class="no">CH.03</span><a href="#ch3">情報マネジメントのライフサイクル(PIM / AIM)</a></li>
+    <li><span class="no">CH.04</span><a href="#ch4">当事者と役割 — 3層の契約構造</a></li>
+    <li><span class="no">CH.05</span><a href="#ch5">情報要求事項の階層(OIR / AIR / PIR / EIR)</a></li>
+    <li><span class="no">CH.06</span><a href="#ch6">CDE — 共通データ環境と情報コンテナ</a></li>
+    <li><span class="no">CH.07</span><a href="#ch7">納品プロセスと計画(BEP / TIDP / MIDP)</a></li>
+    <li><span class="no">CH.08</span><a href="#ch8">LOIN — 情報の詳細度という考え方</a></li>
+    <li><span class="no">CH.09</span><a href="#ch9">Part 3・4・5・6 — 運用・交換・セキュリティ・安全衛生</a></li>
+    <li><span class="no">CH.10</span><a href="#ch10">日本の建設実務への適用と論点</a></li>
+    <li><span class="no">CH.11</span><a href="#ch11">用語集と学習チェック</a></li>
+  </ol>
+</nav>
+
+<!-- ============ 第1章 ============ -->
+<section id="ch1">
+  <div class="ch-head"><span class="ch-no">CH.01</span><h2 class="ch-title">ISO 19650とは何か — 系譜と本質</h2></div>
+  <p class="ch-goal">この章のゴール:ISO 19650が「BIMモデリングの規格」ではなく「情報マネジメントの規格」であることを、歴史的系譜とともに説明できるようになる。</p>
+
+  <h3><span class="sec">1.1</span>一言でいうと何の規格か</h3>
+  <p>ISO 19650は、建築物・土木構造物の<strong>企画から設計・施工・維持管理・解体に至るライフサイクル全体</strong>にわたって、<em>誰が・いつ・何の情報を・どの品質で・どう受け渡すか</em>を管理するための国際規格群です。正式名称は「Organization and digitization of information about buildings and civil engineering works, including building information modelling (BIM) — Information management using building information modelling」。</p>
+  <p>名称に BIM が含まれますが、規格の主語はあくまで <strong>Information management(情報マネジメント)</strong>です。3Dモデルの作り方やソフトの使い方は規定していません。規定しているのは「情報の要求・生産・承認・交換・保管のプロセスと責任」です。この点を取り違えると、規格全体の読み方を誤ります。</p>
+
+  <h3><span class="sec">1.2</span>系譜 — 英国標準からの国際化</h3>
+  <p>ISO 19650は突然生まれたのではなく、英国のBIM標準体系を母体としています。</p>
+  <table>
+    <tr><th>年</th><th>規格</th><th>位置づけ</th></tr>
+    <tr><td class="mono">2007</td><td>BS 1192:2007</td><td>協働的な情報生産の原則。CDEの原型、命名規則、状態遷移の概念を導入</td></tr>
+    <tr><td class="mono">2013</td><td>PAS 1192-2</td><td>資本的支出フェーズ(設計・施工)の情報マネジメント。英国政府の"BIM Level 2"義務化(2016)の中核</td></tr>
+    <tr><td class="mono">2014〜</td><td>PAS 1192-3 / -5 / -6 ほか</td><td>運用フェーズ、セキュリティ、安全衛生へ拡張</td></tr>
+    <tr><td class="mono">2018〜</td><td>ISO 19650シリーズ</td><td>BS/PAS体系を国際規格化。英国ではUK BIM Frameworkとして国内実装ガイダンスを整備</td></tr>
+  </table>
+  <p>つまりISO 19650は<strong>「英国の実務で10年以上揉まれた運用ルールの国際化」</strong>であり、机上の理想論ではありません。一方で、英国型の契約・調達構造(発注者が情報要求を明示し、段階的に発注する文化)を前提にしている面があり、これが日本適用時の論点になります(第10章)。</p>
+
+  <div class="point"><span class="p-label">POINT — よくある誤解</span>
+  「ISO 19650対応=特定のCDE製品を導入すること」ではありません。規格は<strong>プロセスと責任の枠組み</strong>を定めるものであり、単一ツールの採用を要求していません。CDEは「ソリューション+ワークフロー」の組合せとして定義されており、複数システムの連携で構成することも規格上は自然な解釈です。</div>
+</section>
+
+<!-- ============ 第2章 ============ -->
+<section id="ch2">
+  <div class="ch-head"><span class="ch-no">CH.02</span><h2 class="ch-title">規格ファミリーの全体像(Part 1〜6)</h2></div>
+  <p class="ch-goal">この章のゴール:6つのPartの役割分担を図で描け、どの実務課題がどのPartに対応するか即答できるようになる。</p>
+
+  <h3><span class="sec">2.1</span>6部構成の構造</h3>
+  <p>シリーズは、<strong>概念を定めるPart 1</strong>を土台に、<strong>フェーズ別のプロセス規格(Part 2・3)</strong>と、<strong>横断テーマ規格(Part 4・5・6)</strong>が載る構造です。</p>
+
+  <figure>
+  <svg viewBox="0 0 760 400" xmlns="http://www.w3.org/2000/svg" font-family="'Zen Kaku Gothic New',sans-serif">
+    <defs>
+      <style>
+        .box{fill:#fff;stroke:#39434b;stroke-width:1.5}
+        .lbl{font-size:15px;font-weight:700;fill:#22303a}
+        .sub{font-size:11.5px;fill:#5c6b77}
+        .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;fill:#fff}
+      </style>
+    </defs>
+    <!-- 横断テーマ Part4-6 -->
+    <g>
+      <rect x="40" y="30" width="680" height="60" class="box" fill="#f4f5f2"/>
+      <rect x="40" y="30" width="86" height="60" fill="#1d5fa0"/>
+      <text x="83" y="55" text-anchor="middle" class="tag">横断</text>
+      <text x="83" y="71" text-anchor="middle" class="tag">テーマ</text>
+      <text x="160" y="55" class="lbl" font-size="13.5">Part 4 情報交換(2022) / Part 5 セキュリティ(2020) / Part 6 安全衛生(2025)</text>
+      <text x="160" y="76" class="sub">フェーズを問わず適用される品質・機密・H&amp;S情報の扱い</text>
+    </g>
+    <!-- Part2 / Part3 -->
+    <g>
+      <rect x="40" y="120" width="330" height="120" class="box"/>
+      <rect x="40" y="120" width="330" height="30" fill="#b97b0e"/>
+      <text x="205" y="140" text-anchor="middle" class="tag">DELIVERY PHASE</text>
+      <text x="60" y="176" class="lbl">Part 2(2018)</text>
+      <text x="60" y="198" class="sub">資産の納品フェーズ:設計・施工。</text>
+      <text x="60" y="216" class="sub">発注〜引渡しの8プロセス、BEP、</text>
+      <text x="60" y="232" class="sub">TIDP/MIDP、PIMの構築を規定</text>
+    </g>
+    <g>
+      <rect x="390" y="120" width="330" height="120" class="box"/>
+      <rect x="390" y="120" width="330" height="30" fill="#0b6e4f"/>
+      <text x="555" y="140" text-anchor="middle" class="tag">OPERATIONAL PHASE</text>
+      <text x="410" y="176" class="lbl">Part 3(2020)</text>
+      <text x="410" y="198" class="sub">資産の運用フェーズ:維持管理・FM。</text>
+      <text x="410" y="216" class="sub">AIMの維持、トリガーイベント、</text>
+      <text x="410" y="232" class="sub">運用中の情報マネジメントを規定</text>
+    </g>
+    <!-- Part1 基盤 -->
+    <g>
+      <rect x="40" y="270" width="680" height="90" class="box"/>
+      <rect x="40" y="270" width="680" height="30" fill="#22303a"/>
+      <text x="380" y="290" text-anchor="middle" class="tag">FOUNDATION — 概念と原則</text>
+      <text x="60" y="326" class="lbl">Part 1(2018)</text>
+      <text x="200" y="326" class="sub" font-size="12.5">用語定義、当事者構造、情報要求事項の階層、CDEの概念、情報コンテナ、</text>
+      <text x="200" y="345" class="sub" font-size="12.5">ライフサイクル観 — シリーズ全体の共通言語を定める</text>
+    </g>
+    <!-- 矢印 -->
+    <line x1="205" y1="270" x2="205" y2="240" stroke="#5c6b77" stroke-width="1.5"/>
+    <line x1="555" y1="270" x2="555" y2="240" stroke="#5c6b77" stroke-width="1.5"/>
+    <line x1="380" y1="120" x2="380" y2="90" stroke="#5c6b77" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="380" y="385" text-anchor="middle" class="sub">Part 1 の概念の上に、フェーズ別プロセス(2・3)と横断テーマ(4・5・6)が載る</text>
+  </svg>
+  <figcaption><b>図2-1</b>ISO 19650ファミリーの構造。Part 1が共通言語、Part 2・3がフェーズ別プロセス、Part 4・5・6が横断テーマ。</figcaption>
+  </figure>
+
+  <h3><span class="sec">2.2</span>各Partの要点</h3>
+  <table>
+    <tr><th>Part</th><th>発行</th><th>主題</th><th>実務上の問いへの対応</th></tr>
+    <tr><td class="mono">1</td><td class="mono">2018</td><td>概念と原則</td><td>「そもそも何をマネジメントするのか。誰が当事者か」</td></tr>
+    <tr><td class="mono">2</td><td class="mono">2018</td><td>納品フェーズ(設計・施工)</td><td>「発注から引渡しまで、情報をどう計画・生産・承認するか」</td></tr>
+    <tr><td class="mono">3</td><td class="mono">2020</td><td>運用フェーズ</td><td>「竣工後、資産情報をどう生かし維持するか」</td></tr>
+    <tr><td class="mono">4</td><td class="mono">2022</td><td>情報交換</td><td>「受け渡す情報の品質・受入基準をどう判定するか」</td></tr>
+    <tr><td class="mono">5</td><td class="mono">2020</td><td>セキュリティ志向の情報管理</td><td>「機微情報をどう分類し保護するか」</td></tr>
+    <tr><td class="mono">6</td><td class="mono">2025</td><td>安全衛生情報</td><td>「リスク・インシデント情報をどう構造化し共有するか」</td></tr>
+  </table>
+  <div class="point"><span class="p-label">POINT — 改訂動向(2026年時点)</span>
+  Part 1・2は2024年からレビューに入り、改訂案(DIS)が2026年に公開されています(Part 3も追って改訂予定)。学習は現行版で問題ありませんが、実務で引用する際は最新版の確認を習慣にしてください。</div>
+</section>
+
+<!-- ============ 第3章 ============ -->
+<section id="ch3">
+  <div class="ch-head"><span class="ch-no">CH.03</span><h2 class="ch-title">情報マネジメントのライフサイクル(PIM / AIM)</h2></div>
+  <p class="ch-goal">この章のゴール:PIMとAIMの関係を図で描け、「引渡しとは情報モデルの移管である」という規格の世界観を説明できるようになる。</p>
+
+  <h3><span class="sec">3.1</span>2つの情報モデル</h3>
+  <div class="term"><span class="t-label">KEY TERMS</span>
+    <dl>
+      <dt>PIM(Project Information Model / プロジェクト情報モデル)</dt>
+      <dd>納品フェーズ(設計・施工)で構築される情報モデル。図面・3Dモデル・仕様書・計算書・スケジュールなど、幾何情報と非幾何情報の総体。</dd>
+      <dt>AIM(Asset Information Model / 資産情報モデル)</dt>
+      <dd>運用フェーズで資産の管理・運用の意思決定を支える情報モデル。PIMから必要な情報を引き継ぎ、運用中も更新され続ける。</dd>
+    </dl>
+  </div>
+  <p>規格の世界観では、建物の引渡しは「モノの引渡し」であると同時に<em>「PIMからAIMへの情報の引渡し」</em>です。竣工図書を段ボールで渡して終わり、ではなく、<strong>運用側が使える構造化された情報として何を渡すかを、プロジェクト開始時点から要求事項として定義しておく</strong>——これがシリーズ全体を貫く思想です。</p>
+
+  <figure>
+  <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" font-family="'Zen Kaku Gothic New',sans-serif">
+    <defs>
+      <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#39434b"/></marker>
+    </defs>
+    <!-- タイムライン -->
+    <line x1="40" y1="230" x2="730" y2="230" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr)"/>
+    <text x="60" y="252" font-size="12" fill="#5c6b77">企画</text>
+    <text x="170" y="252" font-size="12" fill="#5c6b77">設計</text>
+    <text x="300" y="252" font-size="12" fill="#5c6b77">施工</text>
+    <text x="435" y="252" font-size="12" fill="#5c6b77">引渡し</text>
+    <text x="560" y="252" font-size="12" fill="#5c6b77">運用・維持管理</text>
+    <line x1="450" y1="60" x2="450" y2="230" stroke="#b97b0e" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <!-- PIM 蓄積カーブ(階段状) -->
+    <path d="M60,220 L140,220 L140,190 L230,190 L230,150 L330,150 L330,105 L450,105"
+      fill="none" stroke="#1d5fa0" stroke-width="3"/>
+    <rect x="90" y="70" width="230" height="28" fill="#e3ecf6" stroke="#1d5fa0"/>
+    <text x="205" y="89" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1d5fa0">PIM:納品フェーズで段階的に蓄積</text>
+    <!-- 移管矢印 -->
+    <line x1="450" y1="105" x2="500" y2="125" stroke="#39434b" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="452" y="45" font-size="12.5" font-weight="700" fill="#b97b0e">引渡し =</text>
+    <text x="452" y="62" font-size="12.5" font-weight="700" fill="#b97b0e">情報モデルの移管</text>
+    <!-- AIM -->
+    <path d="M500,128 L560,128 L560,120 L640,120 L640,126 L720,126"
+      fill="none" stroke="#0b6e4f" stroke-width="3"/>
+    <rect x="500" y="70" width="220" height="28" fill="#e7f2ee" stroke="#0b6e4f"/>
+    <text x="610" y="89" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0b6e4f">AIM:運用中も更新・維持される</text>
+    <text x="500" y="160" font-size="11.5" fill="#5c6b77">※ PIMの全量ではなく、AIRで</text>
+    <text x="500" y="176" font-size="11.5" fill="#5c6b77">　定義した必要情報のみを移管</text>
+  </svg>
+  <figcaption><b>図3-1</b>PIMは納品フェーズで段階的に蓄積され、引渡し時にAIMへ移管される。移管すべき範囲は事前にAIR(第5章)で定義する。</figcaption>
+  </figure>
+
+  <div class="point"><span class="p-label">POINT — 逆算の思想</span>
+  「運用で何の情報が要るか(AIR)」が先にあり、そこから「プロジェクトで何を作るか(PIR→EIR)」が逆算される。この<strong>川下からの逆算構造</strong>がISO 19650の背骨です。次章の当事者構造、第5章の要求事項カスケードはすべてこの思想の展開です。</div>
+</section>
+
+<!-- ============ 第4章 ============ -->
+<section id="ch4">
+  <div class="ch-head"><span class="ch-no">CH.04</span><h2 class="ch-title">当事者と役割 — 3層の契約構造</h2></div>
+  <p class="ch-goal">この章のゴール:appointing party / lead appointed party / appointed party の3層構造と、「情報マネジメント機能」の所在を説明できるようになる。</p>
+
+  <h3><span class="sec">4.1</span>役職名ではなく「契約上の位置」で定義する</h3>
+  <p>ISO 19650は当事者を「設計者」「施工者」といった職能ではなく、<strong>契約(appointment)における位置</strong>で定義します。これにより、国や調達方式が違っても同じ枠組みで語れます。</p>
+  <div class="term"><span class="t-label">KEY TERMS</span>
+    <dl>
+      <dt>Appointing party(発注当事者)</dt>
+      <dd>情報の受け手。典型的には発注者・事業主。情報要求事項(EIR等)を定義する責任を持つ。</dd>
+      <dt>Lead appointed party(主受注当事者)</dt>
+      <dd>発注当事者と直接契約する受注者の代表。典型的には元請(設計事務所・ゼネコン)。デリバリーチーム全体の情報を統括する。</dd>
+      <dt>Appointed party(受注当事者)</dt>
+      <dd>情報を生産する側。専門工事会社・協力会社など。タスクチームを構成して情報を生産する。</dd>
+      <dt>Delivery team / Task team</dt>
+      <dd>主受注当事者を頂点とする受注側全体がデリバリーチーム。その中で特定の情報生産を担う単位がタスクチーム。</dd>
+    </dl>
+  </div>
+
+  <figure>
+  <svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" font-family="'Zen Kaku Gothic New',sans-serif">
+    <defs><marker id="arr2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#5c6b77"/></marker></defs>
+    <!-- Appointing party -->
+    <rect x="260" y="24" width="240" height="58" fill="#22303a"/>
+    <text x="380" y="48" text-anchor="middle" font-size="14.5" font-weight="700" fill="#fff">Appointing party(発注当事者)</text>
+    <text x="380" y="68" text-anchor="middle" font-size="11.5" fill="#c9cfc9">情報要求を定義し、受け入れる側</text>
+    <!-- 契約線 -->
+    <line x1="380" y1="82" x2="380" y2="122" stroke="#5c6b77" stroke-width="1.5" marker-end="url(#arr2)"/>
+    <text x="392" y="106" font-size="11" fill="#b97b0e" font-weight="700">契約 + EIR</text>
+    <!-- Lead appointed -->
+    <rect x="230" y="124" width="300" height="58" fill="#1d5fa0"/>
+    <text x="380" y="148" text-anchor="middle" font-size="14.5" font-weight="700" fill="#fff">Lead appointed party(主受注当事者)</text>
+    <text x="380" y="168" text-anchor="middle" font-size="11.5" fill="#e3ecf6">デリバリーチームの情報を統括(例:元請)</text>
+    <!-- 契約線×3 -->
+    <line x1="300" y1="182" x2="180" y2="228" stroke="#5c6b77" stroke-width="1.5" marker-end="url(#arr2)"/>
+    <line x1="380" y1="182" x2="380" y2="228" stroke="#5c6b77" stroke-width="1.5" marker-end="url(#arr2)"/>
+    <line x1="460" y1="182" x2="580" y2="228" stroke="#5c6b77" stroke-width="1.5" marker-end="url(#arr2)"/>
+    <!-- Appointed parties -->
+    <g>
+      <rect x="80" y="230" width="200" height="52" fill="#fff" stroke="#1d5fa0" stroke-width="1.5"/>
+      <text x="180" y="252" text-anchor="middle" font-size="13" font-weight="700" fill="#22303a">Appointed party A</text>
+      <text x="180" y="270" text-anchor="middle" font-size="11" fill="#5c6b77">例:構造設計</text>
+      <rect x="280" y="230" width="200" height="52" fill="#fff" stroke="#1d5fa0" stroke-width="1.5"/>
+      <text x="380" y="252" text-anchor="middle" font-size="13" font-weight="700" fill="#22303a">Appointed party B</text>
+      <text x="380" y="270" text-anchor="middle" font-size="11" fill="#5c6b77">例:設備サブコン</text>
+      <rect x="480" y="230" width="200" height="52" fill="#fff" stroke="#1d5fa0" stroke-width="1.5"/>
+      <text x="580" y="252" text-anchor="middle" font-size="13" font-weight="700" fill="#22303a">Appointed party C</text>
+      <text x="580" y="270" text-anchor="middle" font-size="11" fill="#5c6b77">例:鉄骨ファブ</text>
+    </g>
+    <!-- タスクチーム -->
+    <rect x="80" y="296" width="600" height="34" fill="#f4f5f2" stroke="#c9cfc9"/>
+    <text x="380" y="318" text-anchor="middle" font-size="12" fill="#5c6b77">各当事者の中に Task team(情報生産の実行単位)が編成される</text>
+    <!-- デリバリーチーム囲み -->
+    <rect x="60" y="112" width="640" height="230" fill="none" stroke="#b97b0e" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="72" y="350" font-size="11.5" fill="#b97b0e" font-weight="700">Delivery team(受注側全体)</text>
+  </svg>
+  <figcaption><b>図4-1</b>3層の当事者構造。契約の連鎖に沿って情報要求事項(EIR)がカスケードし、情報は逆方向に集約されて納品される。</figcaption>
+  </figure>
+
+  <h3><span class="sec">4.2</span>情報マネジメント機能(Information Management Function)</h3>
+  <p>規格は「BIMマネージャーを置け」とは言いません。代わりに<strong>「情報マネジメント機能」という職務の束</strong>を定義し、それを誰が担うかは各プロジェクトで割り当てる、という設計です。発注当事者が自ら担っても、主受注当事者や第三者に委任してもよい——ただし<em>委任しても説明責任(accountability)は発注当事者に残る</em>のが原則です。</p>
+  <div class="point"><span class="p-label">POINT — 実務での急所</span>
+  日本の実務では、発注者に情報マネジメント能力がなく、この機能が事実上ゼネコンに丸ごと預けられるケースが多い。「機能の委任」と「責任の所在」を切り分けて設計できるかが、規格適用の成否を分けます(第10章で詳述)。RACIで整理する際は、Accountable を安易に受注側へ移さないことが原則です。</div>
+</section>
+
+<!-- ============ 第5章 ============ -->
+<section id="ch5">
+  <div class="ch-head"><span class="ch-no">CH.05</span><h2 class="ch-title">情報要求事項の階層(OIR / AIR / PIR / EIR)</h2></div>
+  <p class="ch-goal">この章のゴール:4種類の情報要求事項の関係をカスケード図で描け、「EIRは契約文書である」ことの意味を説明できるようになる。</p>
+
+  <h3><span class="sec">5.1</span>要求事項のカスケード</h3>
+  <p>ISO 19650の情報要求事項は、<strong>組織の目的から個別契約の納品物まで段階的に具体化される</strong>階層構造を持ちます。</p>
+
+  <figure>
+  <svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" font-family="'Zen Kaku Gothic New',sans-serif">
+    <defs><marker id="arr3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#39434b"/></marker></defs>
+    <!-- OIR -->
+    <rect x="230" y="20" width="300" height="56" fill="#22303a"/>
+    <text x="380" y="44" text-anchor="middle" font-size="14.5" font-weight="700" fill="#fff">OIR:組織の情報要求事項</text>
+    <text x="380" y="63" text-anchor="middle" font-size="11" fill="#c9cfc9">経営・資産運用の意思決定に必要な情報は何か</text>
+    <!-- 分岐 -->
+    <line x1="310" y1="76" x2="200" y2="120" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr3)"/>
+    <line x1="450" y1="76" x2="560" y2="120" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr3)"/>
+    <!-- AIR -->
+    <rect x="60" y="122" width="290" height="56" fill="#0b6e4f"/>
+    <text x="205" y="146" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">AIR:資産情報要求事項</text>
+    <text x="205" y="165" text-anchor="middle" font-size="11" fill="#e7f2ee">運用・維持管理のために必要な情報(→AIMへ)</text>
+    <!-- PIR -->
+    <rect x="410" y="122" width="290" height="56" fill="#b97b0e"/>
+    <text x="555" y="146" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">PIR:プロジェクト情報要求事項</text>
+    <text x="555" y="165" text-anchor="middle" font-size="11" fill="#fdf3e0">プロジェクトの意思決定ポイントで必要な情報</text>
+    <!-- 合流 -->
+    <line x1="205" y1="178" x2="330" y2="230" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr3)"/>
+    <line x1="555" y1="178" x2="430" y2="230" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr3)"/>
+    <!-- EIR -->
+    <rect x="230" y="232" width="300" height="56" fill="#1d5fa0"/>
+    <text x="380" y="256" text-anchor="middle" font-size="14.5" font-weight="700" fill="#fff">EIR:交換情報要求事項</text>
+    <text x="380" y="275" text-anchor="middle" font-size="11" fill="#e3ecf6">個別契約に添付される具体的な情報要求(契約文書)</text>
+    <!-- 応答 -->
+    <line x1="380" y1="288" x2="380" y2="326" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr3)"/>
+    <rect x="230" y="328" width="300" height="42" fill="#fff" stroke="#1d5fa0" stroke-width="1.5"/>
+    <text x="380" y="348" text-anchor="middle" font-size="13" font-weight="700" fill="#1d5fa0">BEP(BIM実行計画)= 受注側の応答</text>
+    <text x="380" y="364" text-anchor="middle" font-size="10.5" fill="#5c6b77">「その要求にこう応えます」という計画(第7章)</text>
+    <!-- 側注 -->
+    <text x="40" y="240" font-size="11" fill="#5c6b77">発注側が</text>
+    <text x="40" y="256" font-size="11" fill="#5c6b77">定義する</text>
+    <text x="660" y="340" font-size="11" fill="#5c6b77">受注側が</text>
+    <text x="660" y="356" font-size="11" fill="#5c6b77">応答する</text>
+  </svg>
+  <figcaption><b>図5-1</b>情報要求事項のカスケード。OIRを頂点に、運用系(AIR)とプロジェクト系(PIR)に分岐し、個別契約のEIRへ具体化。受注側はBEPで応答する。</figcaption>
+  </figure>
+
+  <table>
+    <tr><th>略語</th><th>正式名称</th><th>問い</th><th>定義主体</th></tr>
+    <tr><td class="mono">OIR</td><td>Organizational Information Requirements</td><td>組織の目的達成に何の情報が要るか</td><td>資産保有組織</td></tr>
+    <tr><td class="mono">AIR</td><td>Asset Information Requirements</td><td>資産の運用・維持に何の情報が要るか</td><td>発注当事者(資産管理側)</td></tr>
+    <tr><td class="mono">PIR</td><td>Project Information Requirements</td><td>プロジェクトの意思決定に何の情報が要るか</td><td>発注当事者</td></tr>
+    <tr><td class="mono">EIR</td><td>Exchange Information Requirements</td><td>この契約で、いつ・何を・どの形式・どの詳細度で納めるか</td><td>発注当事者(各契約ごと)</td></tr>
+  </table>
+
+  <div class="point"><span class="p-label">POINT — EIRの二重の性格</span>
+  EIRは技術文書であると同時に<strong>契約文書</strong>です。EIRが曖昧なままだと、受注側は「何を作れば合格か」を知らずに情報生産することになり、CDEやBIMツールをどれだけ整備しても手戻りは消えません。<em>ツール選定の前にEIRの品質</em>——これが規格の順序です。また、主受注当事者は自らのEIRを下位の受注当事者へ再展開する(カスケードさせる)責任を負います。</div>
+</section>
+
+<!-- ============ 第6章 ============ -->
+<section id="ch6">
+  <div class="ch-head"><span class="ch-no">CH.06</span><h2 class="ch-title">CDE — 共通データ環境と情報コンテナ</h2></div>
+  <p class="ch-goal">この章のゴール:CDEの4状態と遷移条件、情報コンテナのメタデータ(状態・リビジョン・分類)を説明できるようになる。</p>
+
+  <h3><span class="sec">6.1</span>CDEは「場所」ではなく「ワークフロー」</h3>
+  <p>CDE(Common Data Environment)は、プロジェクト・資産の情報を収集・管理・共有するための<strong>合意された情報源</strong>です。規格上のCDEは「特定製品」ではなく、<em>ソリューション(技術)とワークフロー(プロセス)の組合せ</em>として定義されます。複数のシステムを役割分担させて全体で1つのCDEワークフローを構成することも規格の想定内です。</p>
+
+  <h3><span class="sec">6.2</span>情報コンテナと4つの状態</h3>
+  <div class="term"><span class="t-label">KEY TERM</span>
+    <dl><dt>情報コンテナ(Information container)</dt>
+    <dd>名前を付けて永続的に管理される情報の集合。ファイル(モデル・図面・文書)だけでなく、システム内のデータセットも含む。各コンテナは状態・リビジョン・分類のメタデータを持つ。</dd></dl>
+  </div>
+
+  <figure>
+  <svg viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" font-family="'Zen Kaku Gothic New',sans-serif">
+    <defs><marker id="arr4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#39434b"/></marker></defs>
+    <!-- WIP -->
+    <rect x="40" y="60" width="200" height="110" fill="#fdf3e0" stroke="#b97b0e" stroke-width="2"/>
+    <text x="140" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#b97b0e">作業中(WIP)</text>
+    <text x="140" y="115" text-anchor="middle" font-size="11.5" fill="#5c6b77">タスクチーム内でのみ</text>
+    <text x="140" y="132" text-anchor="middle" font-size="11.5" fill="#5c6b77">閲覧・編集できる状態</text>
+    <text x="140" y="156" text-anchor="middle" font-size="10.5" fill="#b97b0e">他チームからは見えない</text>
+    <!-- Shared -->
+    <rect x="300" y="60" width="200" height="110" fill="#e3ecf6" stroke="#1d5fa0" stroke-width="2"/>
+    <text x="400" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#1d5fa0">共有(Shared)</text>
+    <text x="400" y="115" text-anchor="middle" font-size="11.5" fill="#5c6b77">他のタスクチームとの</text>
+    <text x="400" y="132" text-anchor="middle" font-size="11.5" fill="#5c6b77">調整・参照用に公開</text>
+    <text x="400" y="156" text-anchor="middle" font-size="10.5" fill="#1d5fa0">干渉チェック等はここで</text>
+    <!-- Published -->
+    <rect x="560" y="60" width="180" height="110" fill="#e7f2ee" stroke="#0b6e4f" stroke-width="2"/>
+    <text x="650" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#0b6e4f">公開(Published)</text>
+    <text x="650" y="115" text-anchor="middle" font-size="11.5" fill="#5c6b77">発注当事者の承認を経て</text>
+    <text x="650" y="132" text-anchor="middle" font-size="11.5" fill="#5c6b77">使用が認められた状態</text>
+    <text x="650" y="156" text-anchor="middle" font-size="10.5" fill="#0b6e4f">契約上の納品物</text>
+    <!-- 遷移 -->
+    <line x1="240" y1="105" x2="298" y2="105" stroke="#39434b" stroke-width="2" marker-end="url(#arr4)"/>
+    <text x="269" y="95" text-anchor="middle" font-size="10.5" fill="#39434b" font-weight="700">チェック</text>
+    <text x="269" y="130" text-anchor="middle" font-size="10.5" fill="#39434b">レビュー・承認</text>
+    <line x1="500" y1="105" x2="558" y2="105" stroke="#39434b" stroke-width="2" marker-end="url(#arr4)"/>
+    <text x="529" y="95" text-anchor="middle" font-size="10.5" fill="#39434b" font-weight="700">承認</text>
+    <text x="529" y="130" text-anchor="middle" font-size="10.5" fill="#39434b">(発注側)</text>
+    <!-- 差戻し -->
+    <path d="M400,172 L400,200 L140,200 L140,172" fill="none" stroke="#b97b0e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr4)"/>
+    <text x="270" y="193" text-anchor="middle" font-size="10.5" fill="#b97b0e">不合格なら差戻し</text>
+    <!-- Archive -->
+    <rect x="230" y="240" width="300" height="60" fill="#f4f5f2" stroke="#5c6b77" stroke-width="2"/>
+    <text x="380" y="266" text-anchor="middle" font-size="15" font-weight="700" fill="#5c6b77">アーカイブ(Archived)</text>
+    <text x="380" y="286" text-anchor="middle" font-size="11" fill="#5c6b77">全ての取引・変更履歴を監査可能な形で保存</text>
+    <line x1="140" y1="170" x2="255" y2="240" stroke="#5c6b77" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arr4)"/>
+    <line x1="400" y1="205" x2="400" y2="238" stroke="#5c6b77" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arr4)"/>
+    <line x1="650" y1="170" x2="505" y2="240" stroke="#5c6b77" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arr4)"/>
+    <text x="380" y="322" text-anchor="middle" font-size="11" fill="#5c6b77">各状態の履歴はすべてアーカイブへ(監査証跡)</text>
+  </svg>
+  <figcaption><b>図6-1</b>CDEの状態遷移。状態を進めるたびにチェック/レビュー/承認のゲートがあり、全履歴がアーカイブされる。</figcaption>
+  </figure>
+
+  <h3><span class="sec">6.3</span>メタデータ:状態コード・リビジョン・分類</h3>
+  <p>各情報コンテナには最低限、<strong>①状態(status/suitability:その情報を何に使ってよいか)、②リビジョン、③分類</strong>のメタデータを付与します。英国実装では「S0=WIP」「S1=調整用に共有」「A1=承認済」等の状態コード体系が普及しており、日本のプロジェクトでも命名規則・属性設計の参考になります。</p>
+  <div class="point"><span class="p-label">POINT — 「見えない」ことにも意味がある</span>
+  WIPが他チームから見えないのは欠陥ではなく設計です。<strong>未検証の情報が参照されて意思決定に使われる事故</strong>を防ぐのが状態管理の目的。逆に言えば、状態遷移のゲート(誰がチェックし誰が承認するか)を定義しないままフォルダを共有するのは、CDEではなくただの共有ドライブです。</div>
+</section>
+
+<!-- ============ 第7章 ============ -->
+<section id="ch7">
+  <div class="ch-head"><span class="ch-no">CH.07</span><h2 class="ch-title">納品プロセスと計画(BEP / TIDP / MIDP)</h2></div>
+  <p class="ch-goal">この章のゴール:ISO 19650-2の8プロセスの流れを描け、BEP・TIDP・MIDP・責任マトリクスの関係を説明できるようになる。</p>
+
+  <h3><span class="sec">7.1</span>納品フェーズの8プロセス</h3>
+  <p>Part 2は、1つの契約(appointment)を単位として、情報マネジメントを8つの活動に分けて規定します。</p>
+
+  <figure>
+  <svg viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg" font-family="'Zen Kaku Gothic New',sans-serif">
+    <defs><marker id="arr5" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#39434b"/></marker></defs>
+    <!-- 上段 1-4 -->
+    <g font-size="12.5">
+      <rect x="40" y="40" width="160" height="76" fill="#fff" stroke="#22303a" stroke-width="1.5"/>
+      <rect x="40" y="40" width="160" height="24" fill="#22303a"/>
+      <text x="120" y="57" text-anchor="middle" fill="#fff" font-weight="700">1. 評価とニーズ</text>
+      <text x="120" y="84" text-anchor="middle" fill="#5c6b77" font-size="11">要求事項・基準・</text>
+      <text x="120" y="100" text-anchor="middle" fill="#5c6b77" font-size="11">CDEの準備(発注側)</text>
+
+      <rect x="220" y="40" width="160" height="76" fill="#fff" stroke="#22303a" stroke-width="1.5"/>
+      <rect x="220" y="40" width="160" height="24" fill="#22303a"/>
+      <text x="300" y="57" text-anchor="middle" fill="#fff" font-weight="700">2. 入札招請</text>
+      <text x="300" y="84" text-anchor="middle" fill="#5c6b77" font-size="11">EIRを含む入札図書</text>
+      <text x="300" y="100" text-anchor="middle" fill="#5c6b77" font-size="11">の発出</text>
+
+      <rect x="400" y="40" width="160" height="76" fill="#fff" stroke="#1d5fa0" stroke-width="1.5"/>
+      <rect x="400" y="40" width="160" height="24" fill="#1d5fa0"/>
+      <text x="480" y="57" text-anchor="middle" fill="#fff" font-weight="700">3. 入札応答</text>
+      <text x="480" y="84" text-anchor="middle" fill="#5c6b77" font-size="11">(受注前)BEP・能力</text>
+      <text x="480" y="100" text-anchor="middle" fill="#5c6b77" font-size="11">評価・リスク提示</text>
+
+      <rect x="580" y="40" width="160" height="76" fill="#fff" stroke="#1d5fa0" stroke-width="1.5"/>
+      <rect x="580" y="40" width="160" height="24" fill="#1d5fa0"/>
+      <text x="660" y="57" text-anchor="middle" fill="#fff" font-weight="700">4. 契約(任命)</text>
+      <text x="660" y="84" text-anchor="middle" fill="#5c6b77" font-size="11">BEP確定・TIDP/MIDP</text>
+      <text x="660" y="100" text-anchor="middle" fill="#5c6b77" font-size="11">を契約に紐付け</text>
+    </g>
+    <line x1="200" y1="78" x2="218" y2="78" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr5)"/>
+    <line x1="380" y1="78" x2="398" y2="78" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr5)"/>
+    <line x1="560" y1="78" x2="578" y2="78" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr5)"/>
+    <!-- 折返し -->
+    <path d="M660,116 L660,150 L120,150 L120,182" fill="none" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr5)"/>
+    <!-- 下段 5-8 -->
+    <g font-size="12.5">
+      <rect x="40" y="184" width="160" height="76" fill="#fff" stroke="#b97b0e" stroke-width="1.5"/>
+      <rect x="40" y="184" width="160" height="24" fill="#b97b0e"/>
+      <text x="120" y="201" text-anchor="middle" fill="#fff" font-weight="700">5. 動員</text>
+      <text x="120" y="228" text-anchor="middle" fill="#5c6b77" font-size="11">人・技術・CDEの</text>
+      <text x="120" y="244" text-anchor="middle" fill="#5c6b77" font-size="11">セットアップと検証</text>
+
+      <rect x="220" y="184" width="160" height="76" fill="#fff" stroke="#b97b0e" stroke-width="1.5"/>
+      <rect x="220" y="184" width="160" height="24" fill="#b97b0e"/>
+      <text x="300" y="201" text-anchor="middle" fill="#fff" font-weight="700">6. 協働的な情報生産</text>
+      <text x="300" y="228" text-anchor="middle" fill="#5c6b77" font-size="11">WIP→共有のサイクル</text>
+      <text x="300" y="244" text-anchor="middle" fill="#5c6b77" font-size="11">(プロジェクトの日常)</text>
+
+      <rect x="400" y="184" width="160" height="76" fill="#fff" stroke="#0b6e4f" stroke-width="1.5"/>
+      <rect x="400" y="184" width="160" height="24" fill="#0b6e4f"/>
+      <text x="480" y="201" text-anchor="middle" fill="#fff" font-weight="700">7. 情報モデルの納品</text>
+      <text x="480" y="228" text-anchor="middle" fill="#5c6b77" font-size="11">承認を経てPublishedへ</text>
+      <text x="480" y="244" text-anchor="middle" fill="#5c6b77" font-size="11">(意思決定ポイント毎)</text>
+
+      <rect x="580" y="184" width="160" height="76" fill="#fff" stroke="#0b6e4f" stroke-width="1.5"/>
+      <rect x="580" y="184" width="160" height="24" fill="#0b6e4f"/>
+      <text x="660" y="201" text-anchor="middle" fill="#fff" font-weight="700">8. プロジェクト完了</text>
+      <text x="660" y="228" text-anchor="middle" fill="#5c6b77" font-size="11">PIM→AIMへの移管、</text>
+      <text x="660" y="244" text-anchor="middle" fill="#5c6b77" font-size="11">教訓のアーカイブ</text>
+    </g>
+    <line x1="200" y1="222" x2="218" y2="222" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr5)"/>
+    <line x1="380" y1="222" x2="398" y2="222" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr5)"/>
+    <line x1="560" y1="222" x2="578" y2="222" stroke="#39434b" stroke-width="1.5" marker-end="url(#arr5)"/>
+    <path d="M480,260 L480,286 L300,286 L300,262" fill="none" stroke="#b97b0e" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arr5)"/>
+    <text x="390" y="302" text-anchor="middle" font-size="11" fill="#b97b0e">6⇄7 は納品マイルストーン毎に反復</text>
+    <text x="380" y="328" text-anchor="middle" font-size="11" fill="#5c6b77">■発注側主導  ■入札〜契約  ■生産(受注側主導)  ■納品・完了</text>
+  </svg>
+  <figcaption><b>図7-1</b>ISO 19650-2の8プロセス。1つの契約単位で回り、プロジェクトには契約の数だけこのサイクルが存在する。</figcaption>
+  </figure>
+
+  <h3><span class="sec">7.2</span>BEP — 要求への「応答」としての実行計画</h3>
+  <p>BEP(BIM Execution Plan)は受注側がEIRに対して提出する実行計画で、2段階あります。<strong>受注前BEP(pre-appointment BEP)</strong>は入札時の提案・能力表明、<strong>受注後BEP</strong>は契約後に確定させる詳細計画です。情報生産の方法・基準、連携戦略、CDE運用、スケジュールなどを含みます。</p>
+
+  <h3><span class="sec">7.3</span>TIDP と MIDP — 納品計画の積み上げ</h3>
+  <div class="term"><span class="t-label">KEY TERMS</span>
+    <dl>
+      <dt>TIDP(Task Information Delivery Plan)</dt>
+      <dd>各タスクチームが作る納品計画。「どの情報コンテナを・誰が・いつまでに・どの詳細度で」のリスト。</dd>
+      <dt>MIDP(Master Information Delivery Plan)</dt>
+      <dd>主受注当事者が全タスクチームのTIDPを統合した全体納品計画。プロジェクトの情報納品の「マスタ工程表」。</dd>
+    </dl>
+  </div>
+  <p>関係は単純で、<span class="mono">ΣTIDP → MIDP</span>。ただし単純合算ではなく、<strong>タスク間の依存関係(構造モデルが先、設備が後、など)を調整して整合させる</strong>のが主受注当事者の腕の見せ所です。あわせて、誰が何の情報生産に責任を持つかを<strong>責任マトリクス</strong>(高レベル+詳細)で定義します。ここはRACI整理と極めて相性が良い領域です。</p>
+</section>
+
+<!-- ============ 第8章 ============ -->
+<section id="ch8">
+  <div class="ch-head"><span class="ch-no">CH.08</span><h2 class="ch-title">LOIN — 情報の詳細度という考え方</h2></div>
+  <p class="ch-goal">この章のゴール:LODとLOINの違いを説明でき、「目的から必要な情報量を決める」という発想を要求事項定義に使えるようになる。</p>
+
+  <h3><span class="sec">8.1</span>LODからLOINへ</h3>
+  <p>従来の LOD(Level of Development / Detail)は「モデルの作り込み度」を段階で表す発想でした。ISO 19650が採用する <strong>LOIN(Level of Information Need / 情報の詳細度)</strong>は発想が逆で、<em>「その情報は何の目的に使うのか」から出発し、目的に必要な最小限の情報を定義する</em>枠組みです。</p>
+  <table>
+    <tr><th>観点</th><th>LOD的発想</th><th>LOIN的発想</th></tr>
+    <tr><td>出発点</td><td>モデルをどこまで作るか</td><td>情報を何に使うか(目的・利用シーン)</td></tr>
+    <tr><td>構成</td><td>主に幾何の詳細度</td><td>①幾何情報 ②属性(英数字)情報 ③文書 の3軸で定義</td></tr>
+    <tr><td>リスク</td><td>過剰モデリング(使われない詳細)</td><td>要求定義の手間(ただし手戻りは減る)</td></tr>
+  </table>
+  <p>LOINの定義方法は姉妹規格 <strong>ISO 7817-1:2024</strong>(旧EN 17412-1)が規定しています。「多すぎる情報はノイズでありコスト」という思想は、CDE設計・属性設計・ラベル設計すべてに通底する原則です。</p>
+  <div class="point"><span class="p-label">POINT — 実務への翻訳</span>
+  EIRに「LOD 350で」と書くのは規格の思想からするとやや粗い指定です。「維持管理で機器更新判断に使うため、機械設備は型番・製造者・耐用年数の属性を必須、幾何は干渉確認可能な程度」のように<strong>目的→3軸(幾何・属性・文書)</strong>で書くのがLOIN流です。</div>
+</section>
+
+<!-- ============ 第9章 ============ -->
+<section id="ch9">
+  <div class="ch-head"><span class="ch-no">CH.09</span><h2 class="ch-title">Part 3・4・5・6 — 運用・交換・セキュリティ・安全衛生</h2></div>
+  <p class="ch-goal">この章のゴール:残る4つのPartの守備範囲を要約でき、必要になったときにどれを開けばよいか判断できるようになる。</p>
+
+  <h3><span class="sec">9.1</span>Part 3:運用フェーズ(2020)</h3>
+  <p>竣工後の資産運用における情報マネジメントを規定。核となるのは<strong>AIMの維持</strong>と<strong>トリガーイベント</strong>(修繕・改修・テナント入替・売買・点検など、情報の更新や交換が必要になる出来事)の概念です。運用中もPart 2と同型の「要求→計画→生産→承認」サイクルが回ります。ISO 55000(アセットマネジメント)系との親和性が高いPartです。</p>
+
+  <h3><span class="sec">9.2</span>Part 4:情報交換(2022)</h3>
+  <p>情報の受け渡しにおける<strong>品質基準・検証・受入判定</strong>のプロセスと判断基準を規定。「納品されたモデルを何をもって合格とするか」という、Part 2の運用で最も揉めるポイントを補強します。機械可読な検証(IDSによる属性チェック等)と接続しやすい領域です。</p>
+
+  <h3><span class="sec">9.3</span>Part 5:セキュリティ志向の情報管理(2020)</h3>
+  <p>資産・プロジェクトに関する<strong>機微情報の特定・分類・保護</strong>を規定。セキュリティトリアージ(この資産に機微性があるか)から始まり、必要ならセキュリティ戦略・管理計画を策定します。重要インフラ、防犯上機微な施設、データセンター等では必須。CDEのアクセス制御設計(RBAC/ABAC)の上位根拠になります。</p>
+
+  <h3><span class="sec">9.4</span>Part 6:安全衛生情報(2025)</h3>
+  <p>シリーズ最新のPart。<strong>リスク・インシデント・処置(treatment)を構造化スキーマで記述し、CDEを通じてライフサイクル全体で共有する</strong>枠組みです。リスクアセスメントの方法自体は規定せず(それはISO 31000系)、あくまで「安全衛生情報のコミュニケーション規格」である点が特徴。英国の"golden thread"(高リスク建築物の情報一元管理)政策とも接続し、IFCのPset_Riskへのマッピングも附属書で提供されます。BIMを使わない現場にも適用可能な作りになっています。</p>
+</section>
+
+<!-- ============ 第10章 ============ -->
+<section id="ch10">
+  <div class="ch-head"><span class="ch-no">CH.10</span><h2 class="ch-title">日本の建設実務への適用と論点</h2></div>
+  <p class="ch-goal">この章のゴール:ISO 19650が前提とする調達構造と日本の一括請負構造のズレを特定し、適用時の設計論点を3つ挙げられるようになる。</p>
+
+  <h3><span class="sec">10.1</span>前提のズレ:発注者の情報要求能力</h3>
+  <p>ISO 19650は「発注当事者が情報要求(EIR)を定義できる」ことを前提に設計されています。しかし日本では、設計施工一括や詳細を元請に委ねる慣行が強く、<strong>発注者が情報要求を書けない/書かない</strong>ケースが大半です。結果として実務では:</p>
+  <ul class="plain">
+    <li>情報マネジメント機能が事実上ゼネコンに集中する(委任ではなく空白の吸収)</li>
+    <li>EIR不在のままBEP相当(BIM実行計画書)だけが作られ、「何のための情報か」が宙に浮く</li>
+    <li>PIM→AIM移管の要求(AIR)が定義されず、竣工時に情報が死蔵される</li>
+  </ul>
+  <p>という構図が生まれがちです。規格を「輸入」する際の設計課題は、<em>この空白を誰がどの権限で埋めるかを明示化すること</em>にあります。</p>
+
+  <h3><span class="sec">10.2</span>設計論点3つ</h3>
+  <table>
+    <tr><th>論点</th><th>規格の建前</th><th>日本での現実</th><th>設計の方向性</th></tr>
+    <tr><td><strong>①情報マネジメント機能の所在</strong></td><td>発注当事者が担う(委任可、責任は残る)</td><td>元請が実質吸収</td><td>機能を職務単位に分解し、RACIで「実行は元請・説明責任は発注者」を明文化。第三者(IM支援者)の活用も選択肢</td></tr>
+    <tr><td><strong>②CDE戦略</strong></td><td>ソリューション+ワークフロー(複数可)</td><td>「単一プラットフォーム導入」と誤解されがち</td><td>フェーズ・目的別に複数システムを連携させるフェデレーテッド型を正面から設計。状態遷移とメタデータの一貫性で「1つのCDEワークフロー」を担保</td></tr>
+    <tr><td><strong>③要求事項の日本語化</strong></td><td>OIR/AIR/PIR/EIRのカスケード</td><td>発注者標準(EIR相当)の整備途上。国交省ガイドライン等が部分的に対応</td><td>まず元請側が「仮想EIR」を起こし発注者と合意する運用から始め、徐々に発注者側へ返していく</td></tr>
+  </table>
+
+  <div class="point"><span class="p-label">POINT — 規格は「翻訳装置」として使う</span>
+  ISO 19650の最大の実務価値は、暗黙的に回っている日本の情報の流れを<strong>「当事者・要求事項・状態・責任」という共通語彙に翻訳して可視化できる</strong>ことです。準拠それ自体を目的にするのではなく、自社・自プロジェクトの情報の流れを規格の語彙で書き直してみると、責任の空白や二重管理が構造として浮かび上がります。標準化を押し切るほど、逸脱が「見える」ようになる——これが規格を学ぶ実利です。</div>
+</section>
+
+<!-- ============ 第11章 ============ -->
+<section id="ch11">
+  <div class="ch-head"><span class="ch-no">CH.11</span><h2 class="ch-title">用語集と学習チェック</h2></div>
+  <p class="ch-goal">仕上げ:主要用語を一覧で確認し、10問のセルフチェックで理解を検証する。</p>
+
+  <h3><span class="sec">11.1</span>用語集(クイックリファレンス)</h3>
+  <table>
+    <tr><th>用語</th><th>意味(1行)</th><th>初出</th></tr>
+    <tr><td class="mono">OIR / AIR / PIR / EIR</td><td>組織/資産/プロジェクト/交換の各情報要求事項。カスケード構造</td><td class="mono">CH.05</td></tr>
+    <tr><td class="mono">PIM / AIM</td><td>納品フェーズ/運用フェーズの情報モデル。引渡しで移管</td><td class="mono">CH.03</td></tr>
+    <tr><td class="mono">Appointing party</td><td>発注当事者。情報の受け手、要求の定義者</td><td class="mono">CH.04</td></tr>
+    <tr><td class="mono">Lead appointed party</td><td>主受注当事者。デリバリーチームの情報を統括</td><td class="mono">CH.04</td></tr>
+    <tr><td class="mono">Task team</td><td>情報生産の実行単位</td><td class="mono">CH.04</td></tr>
+    <tr><td class="mono">情報マネジメント機能</td><td>職務の束。担い手は割当制、説明責任は発注側に残る</td><td class="mono">CH.04</td></tr>
+    <tr><td class="mono">CDE</td><td>合意された情報源。ソリューション+ワークフロー</td><td class="mono">CH.06</td></tr>
+    <tr><td class="mono">情報コンテナ</td><td>状態・リビジョン・分類を持つ管理単位</td><td class="mono">CH.06</td></tr>
+    <tr><td class="mono">WIP/Shared/Published/Archived</td><td>CDEの4状態。遷移にはチェック・承認ゲート</td><td class="mono">CH.06</td></tr>
+    <tr><td class="mono">BEP</td><td>受注側の実行計画。受注前/受注後の2段階</td><td class="mono">CH.07</td></tr>
+    <tr><td class="mono">TIDP / MIDP</td><td>タスク別納品計画/その統合版(マスタ)</td><td class="mono">CH.07</td></tr>
+    <tr><td class="mono">LOIN</td><td>目的起点の情報詳細度。幾何・属性・文書の3軸(ISO 7817-1)</td><td class="mono">CH.08</td></tr>
+    <tr><td class="mono">トリガーイベント</td><td>運用中に情報更新・交換を要する出来事(Part 3)</td><td class="mono">CH.09</td></tr>
+  </table>
+
+  <h3><span class="sec">11.2</span>学習チェック(クリックで解答表示)</h3>
+  <details><summary>ISO 19650が規定しているのは「モデリング方法」か「情報マネジメント」か。理由とともに答えよ。</summary><div class="ans">情報マネジメント。規格はモデルの作り方ではなく、情報の要求・生産・承認・交換・保管のプロセスと責任を定義する。BIMは手段として名称に含まれるに過ぎない。(CH.01)</div></details>
+  <details><summary>Part 2とPart 3の守備範囲の違いは?</summary><div class="ans">Part 2は納品フェーズ(設計・施工、PIMの構築)、Part 3は運用フェーズ(AIMの維持、トリガーイベント対応)。(CH.02, 09)</div></details>
+  <details><summary>「引渡し」を情報の観点で言い換えると?</summary><div class="ans">PIMからAIMへの情報モデルの移管。移管範囲はAIRで事前に定義しておく。(CH.03)</div></details>
+  <details><summary>Lead appointed partyの情報マネジメント上の中心的役割は?</summary><div class="ans">デリバリーチーム全体の情報を統括すること。具体的には各タスクチームのTIDPを統合してMIDPを作り、EIRを下位契約へ再展開する。(CH.04, 07)</div></details>
+  <details><summary>OIRからEIRまでのカスケードを、AIRとPIRの分岐を含めて順に述べよ。</summary><div class="ans">OIR(組織)を頂点に、運用系のAIRとプロジェクト系のPIRへ分岐し、両者を踏まえて個別契約のEIRに具体化される。受注側はBEPで応答する。(CH.05)</div></details>
+  <details><summary>EIRが「契約文書」であることの実務的な意味は?</summary><div class="ans">納品物の合否基準が契約上定義されるということ。EIRが曖昧だと受注側は合格条件を知らずに情報生産することになり、ツールを整備しても手戻りは消えない。(CH.05)</div></details>
+  <details><summary>CDEの4状態と、状態を進める際に必要なものは?</summary><div class="ans">作業中(WIP)→共有(Shared)→公開(Published)、および全履歴のアーカイブ(Archived)。遷移にはチェック/レビュー/承認のゲートが必要。ゲートなしの共有フォルダはCDEとは呼べない。(CH.06)</div></details>
+  <details><summary>受注前BEPと受注後BEPの違いは?</summary><div class="ans">受注前BEPは入札時の提案・能力表明、受注後BEPは契約後に確定させる詳細実行計画。(CH.07)</div></details>
+  <details><summary>LODとLOINの発想の違いを一言で。</summary><div class="ans">LODは「どこまで作り込むか」、LOINは「目的に必要な最小限の情報(幾何・属性・文書)は何か」。出発点が成果物か目的かの違い。(CH.08)</div></details>
+  <details><summary>日本の一括請負構造でISO 19650を適用する際の最大の設計課題は?</summary><div class="ans">発注者の情報要求能力の空白を誰がどの権限で埋めるか。情報マネジメント機能を職務分解し、実行(元請)と説明責任(発注者)を切り分けて明示化することが要点。(CH.10)</div></details>
+
+  <h3><span class="sec">11.3</span>次に読むもの</h3>
+  <ul class="plain">
+    <li><strong>規格原文</strong>:ISO 19650-1 → 19650-2 の順。用語定義(Part 1の第3章)は辞書として常時参照</li>
+    <li><strong>UK BIM Framework Guidance</strong>:無償公開の実装ガイダンス。規格の行間を埋める事実上の副読本</li>
+    <li><strong>ISO 7817-1:2024</strong>:LOINの定義方法(第8章の深掘り)</li>
+    <li><strong>関連規格</strong>:IFC(ISO 16739)/ IDS / BCF — 機械可読な情報交換の実装レイヤ</li>
+  </ul>
+</section>
+
+<footer>ISO19650-STUDY-01 / REV.A / 2026-07 — 本テキストは学習用の要約であり、実務での引用は規格原文・最新版を確認のこと。</footer>
+</div>
+</body>
+</html>
