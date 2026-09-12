@@ -48,15 +48,18 @@
 
   .orn{height:1px;width:130px;margin:34px auto 26px;
     background:linear-gradient(to right,transparent,var(--gold),transparent);opacity:.5}
-  .tabs{display:flex;justify-content:center;gap:0;margin:0 0 22px}
-  .tab{background:none;border:0;color:var(--dim);font:inherit;font-size:12px;letter-spacing:.18em;
-    padding:0 13px;cursor:pointer;position:relative;transition:color .25s}
-  .tab+.tab:before{content:"";position:absolute;left:0;top:5px;bottom:5px;width:1px;background:var(--line)}
-  .tab[aria-selected="true"]{color:var(--gold)}
-  .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 0}
-  .chip{background:none;border:0;color:var(--dim);font:inherit;font-size:13px;letter-spacing:.1em;
-    padding:5px 14px;cursor:pointer;border-bottom:1px solid transparent;transition:color .25s,border-color .25s}
-  .chip[aria-pressed="true"]{color:var(--ivory);border-bottom-color:var(--gold)}
+  .pickLabel{font-size:9.5px;letter-spacing:.34em;color:var(--gold);margin:0 0 14px;
+    text-indent:.34em;opacity:.85}
+  .tabs{display:inline-flex;justify-content:center;gap:2px;margin:0 0 20px;
+    background:rgba(150,118,44,.09);border-radius:999px;padding:4px}
+  .tab{background:none;border:0;border-radius:999px;color:var(--dim);font:inherit;font-size:12px;
+    letter-spacing:.14em;padding:7px 15px;cursor:pointer;position:relative;transition:color .25s,background .25s}
+  .tab[aria-selected="true"]{color:#FBF7EE;background:var(--gold)}
+  .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+  .chip{background:none;border:1px solid var(--line);border-radius:999px;color:var(--dim);
+    font:inherit;font-size:12.5px;letter-spacing:.06em;padding:7px 16px;cursor:pointer;
+    transition:color .25s,background .25s,border-color .25s}
+  .chip[aria-pressed="true"]{color:#FBF7EE;background:var(--gold);border-color:var(--gold)}
   .chip:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
   .hint{font-size:11px;color:var(--dim);letter-spacing:.08em;margin:18px 0 0}
 
@@ -107,6 +110,7 @@
   <img class="cover" id="cover" alt="朱希の茶棚">
 
   <div class="wrap center">
+    <p class="pickLabel">選び方</p>
     <div class="tabs" id="tabs"></div>
     <div class="chips" id="chips"></div>
     <p class="hint" id="hint"></p>
