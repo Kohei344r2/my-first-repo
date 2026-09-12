@@ -2,7 +2,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   .tea{--bg:#F2EEE6;--ivory:#33291F;--dim:#948A79;--gold:#96762C;--line:rgba(51,41,31,.11);
-    background:var(--bg);color:var(--ivory);margin:0;padding:0 0 40px;border-radius:6px;
+    background:radial-gradient(140% 100% at 50% 0%,#F6F2EA 0%,var(--bg) 55%,#EAE1D0 100%);
+    color:var(--ivory);margin:0;padding:0 0 40px;border-radius:6px;
     font-family:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Hoefler Text",Georgia,serif;
     line-height:1.85;-webkit-font-smoothing:antialiased}
   .tea *{box-sizing:border-box}
@@ -12,13 +13,14 @@
   header{padding:40px 30px 26px;text-align:center}
   header p{margin:0}
   .mark{font-size:10px;letter-spacing:.62em;color:var(--gold);text-indent:.62em}
-  .rule{font-size:11px;color:var(--gold);opacity:.75;margin:12px auto 0;line-height:1}
-  .rule:before{content:"\2766"}
-  .lede{font-size:12px;color:var(--dim);letter-spacing:.1em;margin-top:10px}
+  .rule{width:6px;height:6px;margin:16px auto 0;background:var(--gold);opacity:.7;transform:rotate(45deg)}
+  .lede{font-size:12px;color:var(--dim);letter-spacing:.1em;margin-top:12px}
 
-  .cover{display:block;width:calc(100% - 60px);margin:6px auto 34px;opacity:.95}
-  figure{margin:0 auto;position:relative;max-width:216px;width:60%}
-  figure img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;
+  .cover{display:block;width:calc(100% - 60px);margin:6px auto 34px;opacity:.96;border-radius:2px;
+    box-shadow:0 20px 40px -18px rgba(51,41,31,.35)}
+  figure{margin:0 auto;position:relative;max-width:216px;width:60%;border-radius:2px;
+    box-shadow:0 22px 36px -16px rgba(51,41,31,.32)}
+  figure img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:2px;
     border:1px solid var(--line)}
   .prog{position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--gold);
     transition:width 1s linear}
@@ -28,6 +30,8 @@
   .house{font-size:9.5px;letter-spacing:.34em;color:var(--gold);margin:20px 0 0;text-indent:.34em}
   .name{font-family:Georgia,"Hoefler Text",serif;font-size:23px;font-weight:400;
     letter-spacing:.05em;margin:9px 0 0;line-height:1.35}
+  .name:after{content:"";display:block;width:28px;height:1px;background:var(--gold);
+    opacity:.55;margin:14px auto 0}
   .kind{font-size:10.5px;letter-spacing:.22em;color:var(--dim);margin:8px 0 0;text-indent:.22em}
   .why{font-size:14px;margin:18px auto 0;max-width:30em;letter-spacing:.02em;color:rgba(46,39,33,.90)}
   .why b{color:var(--gold);font-weight:400}
@@ -40,35 +44,41 @@
   .meta b{color:var(--ivory);font-weight:400;font-family:Georgia,serif;font-size:13.5px;letter-spacing:.04em}
   .go{display:block;margin:22px auto 0;background:none;border:0;border-bottom:1px solid var(--gold);
     color:var(--gold);font:inherit;font-size:13px;letter-spacing:.3em;text-indent:.3em;
-    padding:0 4px 6px;cursor:pointer}
+    padding:0 4px 6px;cursor:pointer;transition:color .25s,border-color .25s}
   .go:focus-visible{outline:1px solid var(--gold);outline-offset:5px}
 
-  hr{border:0;height:11px;margin:34px auto;width:100%;text-align:center;color:var(--gold);opacity:.6}
-  hr:before{content:"\2766";font-size:11px;line-height:1}
-
-  .orn{text-align:center;color:var(--gold);opacity:.55;margin:34px 0 26px;font-size:11px}
-  .orn:before{content:"\2766"}
+  .orn{height:1px;width:130px;margin:34px auto 26px;
+    background:linear-gradient(to right,transparent,var(--gold),transparent);opacity:.5}
   .tabs{display:flex;justify-content:center;gap:0;margin:0 0 22px}
   .tab{background:none;border:0;color:var(--dim);font:inherit;font-size:12px;letter-spacing:.18em;
-    padding:0 13px;cursor:pointer;position:relative}
+    padding:0 13px;cursor:pointer;position:relative;transition:color .25s}
   .tab+.tab:before{content:"";position:absolute;left:0;top:5px;bottom:5px;width:1px;background:var(--line)}
   .tab[aria-selected="true"]{color:var(--gold)}
   .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 0}
   .chip{background:none;border:0;color:var(--dim);font:inherit;font-size:13px;letter-spacing:.1em;
-    padding:5px 14px;cursor:pointer;border-bottom:1px solid transparent}
+    padding:5px 14px;cursor:pointer;border-bottom:1px solid transparent;transition:color .25s,border-color .25s}
   .chip[aria-pressed="true"]{color:var(--ivory);border-bottom-color:var(--gold)}
   .chip:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
   .hint{font-size:11px;color:var(--dim);letter-spacing:.08em;margin:18px 0 0}
 
   .sec{font-size:9.5px;letter-spacing:.34em;color:var(--gold);margin:30px 0 16px;text-indent:.34em}
-  .strip{display:flex;gap:17px;overflow-x:auto;padding:0 30px 6px;scrollbar-width:none}
+  .strip{display:flex;gap:17px;overflow-x:auto;padding:4px 30px 10px;scrollbar-width:none}
   .strip::-webkit-scrollbar{display:none}
   .thumb{flex:0 0 66px;border:0;background:none;padding:0;cursor:pointer}
   .thumb img{width:66px;height:66px;object-fit:cover;display:block;border:1px solid transparent;
-    filter:saturate(.92) opacity(.55);transition:filter .4s,border-color .4s}
-  .thumb.on img{filter:none;border-color:var(--gold)}
+    border-radius:2px;filter:saturate(.92) opacity(.55);
+    transition:filter .4s,border-color .4s,transform .3s,box-shadow .3s}
+  .thumb.on img{filter:none;border-color:var(--gold);box-shadow:0 6px 14px -4px rgba(150,118,44,.4)}
   .thumb span{display:block;font-size:7.5px;letter-spacing:.13em;color:var(--dim);margin-top:9px;line-height:1.5}
   .thumb:focus-visible img{outline:1px solid var(--gold);outline-offset:3px}
+  @media(hover:hover){
+    .thumb:hover img{transform:translateY(-3px)}
+    .go:hover{color:#7c5f20}
+    .tab:hover{color:var(--ivory)}
+    .chip:hover{color:var(--ivory)}
+    .detailToggle:hover{color:var(--ivory)}
+    .shelfToggle:hover{opacity:.8}
+  }
 
   .shelfToggle{background:none;border:0;font:inherit;letter-spacing:.34em;text-indent:.34em;
     font-size:9.5px;color:var(--gold);cursor:pointer;display:block;width:100%;padding:0;margin:30px 0 16px}
@@ -87,6 +97,8 @@
   .detail{display:none;max-width:30em;margin:18px auto 0;text-align:left;font-size:13.5px;
     color:rgba(46,39,33,.9);letter-spacing:.02em;line-height:1.9}
   .detail.open{display:block}
+  .detail:before{content:"";display:block;width:22px;height:1px;background:var(--gold);
+    opacity:.6;margin:0 0 18px}
   .detail p{margin:0 0 14px}
   .detail p:last-of-type{margin-bottom:0}
   .detail a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold);
