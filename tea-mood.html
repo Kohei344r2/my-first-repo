@@ -278,7 +278,7 @@ let mode="now",chip=null,cur=null,near=[],timer=null,left=0;
 
 function slot(){const h=new Date().getHours();
   return h<5?"寝る前":h<10?"朝いちばん":h<15?"仕事中":h<19?"家族と":h<22?"食後に":"寝る前";}
-function lede(){return {"朝いちばん":"朝です。目を覚ます一杯を。","仕事中":"日中です。手が動くうちの一杯を。",
+function lede(){return {"朝いちばん":"朝です。目を覚ます一杯を。","仕事中":"日中です。仕事のお供に一杯を。",
   "家族と":"夕方です。ひと息つく一杯を。","食後に":"夜です。食後の一杯を。",
   "寝る前":"夜更けです。静かに終わる一杯を。"}[slot()];}
 function candidates(){
