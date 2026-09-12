@@ -81,6 +81,8 @@
   .detailToggle{background:none;border:0;border-bottom:1px solid var(--line);color:var(--dim);
     font:inherit;font-size:11px;letter-spacing:.16em;text-indent:.16em;padding:0 0 4px;
     margin:16px auto 0;display:block;cursor:pointer}
+  .detailToggle:after{content:"（タップして開く）";letter-spacing:.05em;text-indent:0;margin-left:.6em}
+  .detailToggle[aria-expanded="true"]:after{content:"（タップして閉じる）"}
   .detailToggle:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
   .detail{display:none;max-width:30em;margin:18px auto 0;text-align:left;font-size:13.5px;
     color:rgba(46,39,33,.9);letter-spacing:.02em;line-height:1.9}
