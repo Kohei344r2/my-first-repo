@@ -33,11 +33,10 @@
   .name:after{content:"";display:block;width:28px;height:1px;background:var(--gold);
     opacity:.55;margin:14px auto 0}
   .kind{font-size:10.5px;letter-spacing:.22em;color:var(--dim);margin:8px 0 0;text-indent:.22em}
-  .why{font-size:14px;margin:18px auto 0;max-width:30em;letter-spacing:.02em;color:rgba(46,39,33,.90)}
-  .why b{color:var(--gold);font-weight:400}
 
-  .meta{display:flex;justify-content:center;align-items:center;gap:0;margin:20px 0 0;
+  .meta{display:none;justify-content:center;align-items:center;gap:0;margin:22px 0 0;
     font-size:11px;letter-spacing:.16em;color:var(--dim)}
+  .meta.shown{display:flex}
   .meta span{padding:0 16px;position:relative}
   .meta span+span:before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:1px;
     background:var(--line)}
@@ -76,7 +75,6 @@
     .go:hover{color:#7c5f20}
     .tab:hover{color:var(--ivory)}
     .chip:hover{color:var(--ivory)}
-    .detailToggle:hover{color:var(--ivory)}
     .shelfToggle:hover{opacity:.8}
   }
 
@@ -88,15 +86,8 @@
   #all{display:none}
   #all.open{display:flex}
 
-  .detailToggle{background:none;border:0;border-bottom:1px solid var(--line);color:var(--dim);
-    font:inherit;font-size:11px;letter-spacing:.16em;text-indent:.16em;padding:0 0 4px;
-    margin:16px auto 0;display:block;cursor:pointer}
-  .detailToggle:after{content:"（タップして開く）";letter-spacing:.05em;text-indent:0;margin-left:.6em}
-  .detailToggle[aria-expanded="true"]:after{content:"（タップして閉じる）"}
-  .detailToggle:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
-  .detail{display:none;max-width:30em;margin:18px auto 0;text-align:left;font-size:13.5px;
+  .detail{max-width:30em;margin:18px auto 0;text-align:left;font-size:13.5px;
     color:rgba(46,39,33,.9);letter-spacing:.02em;line-height:1.9}
-  .detail.open{display:block}
   .detail:before{content:"";display:block;width:22px;height:1px;background:var(--gold);
     opacity:.6;margin:0 0 18px}
   .detail p{margin:0 0 14px}
@@ -120,11 +111,9 @@
     <p class="house" id="house"></p>
     <h2 class="name" id="name"></h2>
     <p class="kind" id="kind"></p>
-    <p class="why" id="why"></p>
+    <div class="detail" id="detail"></div>
     <div class="meta" id="meta"></div>
     <button class="go" id="go">淹れる</button>
-    <button class="detailToggle" id="detailToggle" aria-expanded="false">お茶の詳細</button>
-    <div class="detail" id="detail"></div>
   </div>
 
   <div class="orn"></div>
@@ -303,8 +292,9 @@ function show(t){
   document.getElementById("house").textContent=t.h;
   document.getElementById("name").textContent=t.n;
   document.getElementById("kind").textContent=t.k+(t.caf===0?"・ノンカフェイン":"");
-  document.getElementById("why").innerHTML=t.w;
+  document.getElementById("detail").innerHTML=detailHTML(t);
   meta();
+  document.getElementById("meta").classList.remove("shown");
   document.getElementById("prog").style.width="0";
   const g=document.getElementById("go");
   g.textContent=t.sec===0?"冷蔵庫で一晩":"淹れる";
@@ -313,9 +303,6 @@ function show(t){
   strip("near",near,t);strip("all",T,t);
   document.getElementById("nearLabel").textContent=
     mode==="now"?"いまの時間に合う缶":(chip?chip+"の缶":"この条件に合う缶");
-  document.getElementById("detail").innerHTML=detailHTML(t);
-  document.getElementById("detail").classList.remove("open");
-  document.getElementById("detailToggle").setAttribute("aria-expanded","false");
 }
 function detailHTML(t){
   if(!t.desc)return `<p>${t.w.replace(/<\/?b>/g,"")}</p>`;
@@ -352,6 +339,7 @@ function paint(){
   document.getElementById("hint").textContent=chip?"":"ひとつ選んでください。";
 }
 document.getElementById("go").onclick=()=>{
+  document.getElementById("meta").classList.add("shown");
   if(cur.sec===0)return;
   if(timer){stop();meta();document.getElementById("prog").style.width="0";return;}
   left=cur.sec;tick();
@@ -368,10 +356,6 @@ function done(){meta("できました");document.getElementById("prog").style.wi
 document.getElementById("shelfToggle").onclick=()=>{
   const open=document.getElementById("all").classList.toggle("open");
   document.getElementById("shelfToggle").setAttribute("aria-expanded",open);
-};
-document.getElementById("detailToggle").onclick=()=>{
-  const open=document.getElementById("detail").classList.toggle("open");
-  document.getElementById("detailToggle").setAttribute("aria-expanded",open);
 };
 document.getElementById("cover").src=IMG._shelf;
 document.getElementById("lede").textContent=lede();
