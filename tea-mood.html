@@ -23,7 +23,7 @@
   figure img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:2px;
     border:1px solid var(--line)}
   .prog{position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--gold);
-    transition:width 1s linear}
+    transition:width .25s linear}
   .fade{animation:f .6s ease both}@keyframes f{from{opacity:0}to{opacity:1}}
   @media(prefers-reduced-motion:reduce){.fade{animation:none}}
 
@@ -45,6 +45,10 @@
     color:var(--gold);font:inherit;font-size:13px;letter-spacing:.3em;text-indent:.3em;
     padding:0 4px 6px;cursor:pointer;transition:color .25s,border-color .25s}
   .go:focus-visible{outline:1px solid var(--gold);outline-offset:5px}
+  .reset{display:block;margin:12px auto 0;background:none;border:0;font:inherit;font-size:11px;
+    letter-spacing:.16em;text-indent:.16em;color:var(--dim);cursor:pointer;padding:4px 8px}
+  .reset[hidden]{display:none}
+  .reset:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
 
   .orn{height:1px;width:130px;margin:34px auto 26px;
     background:linear-gradient(to right,transparent,var(--gold),transparent);opacity:.5}
@@ -53,7 +57,7 @@
   .tabs{display:inline-flex;justify-content:center;gap:2px;margin:0 0 20px;
     background:rgba(255,250,246,.6);border-radius:999px;padding:4px}
   .tab{background:none;border:0;border-radius:999px;color:var(--dim);font:inherit;font-size:12px;
-    letter-spacing:.14em;padding:7px 15px;cursor:pointer;position:relative;transition:color .25s,background .25s}
+    letter-spacing:.12em;padding:7px 12px;cursor:pointer;position:relative;transition:color .25s,background .25s}
   .tab[aria-selected="true"]{color:#FBF7EE;background:var(--gold)}
   .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
   .chip{background:none;border:1px solid var(--line);border-radius:999px;color:var(--dim);
@@ -132,6 +136,7 @@
     <div class="detail" id="detail"></div>
     <div class="meta" id="meta"></div>
     <button class="go" id="go">淹れる</button>
+    <button class="reset" id="reset" hidden>はじめから</button>
   </div>
 </div>
 
@@ -140,143 +145,143 @@ const IMG = {"greentea": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
 const T=[
 {id:"empire34",n:"Empire Blend No.34",h:"HARRODS",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"力のある英国ブレンド。<b>朝いちばん</b>、ミルクにも負けません。",
- a:["素朴"],o:["朝いちばん","仕事中"],d:["ミルク","ストレート"],
+ a:["素朴"],o:["朝いちばん","仕事中"],d:["ミルク","ストレート"],f:["焼き菓子","軽食","チョコレート"],
  url:"https://www.harrods.com/en-us/p/harrods-heritage-no-34-empire-blend-loose-leaf-tea-125g-000000000003461768",
  desc:["ハロッズの紅茶の系譜を象徴する、コクのある英国ブレンド「エンパイア ブレンド No.34」。",
   "アッサムを主体に、ニルギリとダージリンを合わせることで、力強さと香りの奥行きを両立させています。",
   "ミルクを注いでも負けない濃厚さがあり、ストレートでもしっかりとした飲みごたえを楽しめます。"]},
 {id:"eng14",n:"English Breakfast No.14",h:"HARRODS",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"迷ったらこれ、という<b>始動用</b>の安心感。",
- a:["素朴"],o:["朝いちばん","家族と"],d:["ミルク","ストレート"],
+ a:["素朴"],o:["朝いちばん","家族と"],d:["ミルク","ストレート"],f:["焼き菓子","軽食"],
  url:"https://www.harrods.com/en-us/p/harrods-no-14-english-breakfast-loose-leaf-tea-125g-000000000007267716",
  desc:["定番の朝の一杯として仕立てられた「イングリッシュ ブレックファスト No.14」。",
   "アッサム、セイロン、ケニア、ダージリンの4つの茶葉を組み合わせ、香り高く飲みやすい味わいに仕上げています。",
   "ミルクを合わせるのはもちろん、アイスティーにしても爽やかに楽しめます。"]},
 {id:"chiyaba",n:"Chiyaba — Early Sunrise",h:"JIUNU",k:"スパイス紅茶",caf:2,temp:95,sec:240,g:"3g",
  w:"ネパール紅茶に玄米・カルダモン・フェンネル・生姜。<b>体を内側から起こす</b>一杯。",
- a:["スパイス"],o:["朝いちばん","家族と"],d:["ミルク","ストレート"],
+ a:["スパイス"],o:["朝いちばん","家族と"],d:["ミルク","ストレート"],f:["焼き菓子","和菓子","中華・エスニック"],
  url:"https://chiyaba.com/products/early-sunrise-100g",
  desc:["ネパール・ヒマラヤ山麓の茶園から届く、スパイス香る「アーリーサンライズ」。",
   "CTC製法のアッサム種紅茶に、香ばしい玄米とカルダモン、フェンネル、生姜を合わせています。",
   "ミルクでいただくことで、和風チャイのような温かみのある一杯になります。"]},
 {id:"alexandra",n:"Alexandra David-Néel",h:"MARIAGE FRÈRES",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"スパイスと柑橘の旅の茶。<b>頭を切り替えたいとき</b>に。",
- a:["スパイス","柑橘"],o:["仕事中","朝いちばん"],d:["ストレート"],
+ a:["スパイス","柑橘"],o:["仕事中","朝いちばん"],d:["ストレート"],f:["チョコレート","焼き菓子","中華・エスニック"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000225",
  desc:["チベットを目指した女性探検家の名を冠した、旅情あふれる「アレクサンドラ・ダヴィッド=ネール」。",
   "中国紅茶に、コショウ、クローブ、生姜、シナモン、カルダモンといったスパイスを重ねています。",
   "ストレートで、スパイスの香りの層をそのまま楽しむのがおすすめです。"]},
 {id:"ceylon16",n:"Afternoon Ceylon No.16",h:"HARRODS",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"軽やかなセイロン。<b>午後の仕切り直し</b>に香りが邪魔をしません。",
- a:["素朴"],o:["仕事中","家族と"],d:["ストレート","アイス"],
+ a:["素朴"],o:["仕事中","家族と"],d:["ストレート","アイス"],f:["果物","軽食","焼き菓子"],
  url:"https://www.harrods.com/en-us/p/harrods-no-16-afternoon-ceylon-loose-leaf-tea-125g-000000000007655828",
  desc:["午後のひとときのために選ばれた、上品な「アフタヌーン セイロン No.16」。",
   "スリランカの高地・中間標高産の茶葉をブレンドし、やわらかな柑橘系の後味を残します。",
   "香りを邪魔しないストレートが基本ですが、アイスにしても軽やかに楽しめます。"]},
 {id:"fmroyal",n:"Royal Blend",h:"FORTNUM & MASON",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"1902年、国王のためにブレンドされた王道の一杯。<b>朝の始まり</b>に。",
- a:["素朴"],o:["朝いちばん","来客に"],d:["ミルク","ストレート"],
+ a:["素朴"],o:["朝いちばん","来客に"],d:["ミルク","ストレート"],f:["焼き菓子","軽食"],
  url:"https://fortnumandmason.co.jp/products/15",
  desc:["1902年にエドワード国王のためにブレンドされた、フォートナム・アンド・メイソンを代表する伝統の紅茶「ロイヤルブレンド」。",
   "インド産とスリランカ産の紅茶を合わせ、セイロンのフラワリーペコの華やかな香りが、モルティーなアッサムの香りを引き立てています。",
   "なめらかで蜂蜜のようなやさしい風味は、ストレートでも、ミルクを合わせても楽しめます。"]},
 {id:"fmearl",n:"Earl Grey Classic",h:"FORTNUM & MASON",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"ベルガモットが爽やかに香る定番。<b>午後のお菓子</b>のお供に。",
- a:["柑橘"],o:["仕事中","食後に","来客に"],d:["ストレート","ミルク"],
+ a:["柑橘"],o:["仕事中","食後に","来客に"],d:["ストレート","ミルク"],f:["軽食","焼き菓子","チョコレート"],
  url:"https://fortnumandmason.co.jp/products/287",
  desc:["1830年代に英国首相を務めたグレイ伯爵の名を冠した、フォートナム・アンド・メイソンの「アールグレイ クラシック」。",
   "中国産とスリランカ（セイロン）産の紅茶にベルガモットの香りを重ね、柑橘の香りが広がる爽やかな味わいに仕上げています。",
   "サンドイッチなどの軽食から、バターたっぷりのショートブレッドまで、英国式のお茶の時間に幅広く寄り添います。"]},
 {id:"montagne",n:"Montagne d'Or",h:"MARIAGE FRÈRES",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"金の山の名を持つ華やかな紅茶。<b>祝いたい日</b>に。",
- a:["果実","花"],o:["来客に","家族と"],d:["ストレート"],
+ a:["果実","花"],o:["来客に","家族と"],d:["ストレート"],f:["果物","焼き菓子"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000035",
  desc:["「黄金の山」の名を持つ、華やかな「モンターニュ・ドール」。",
   "中国紅茶にサフラワー、マリーゴールド、ローズを加え、甘くまろやかな香りに仕上げています。",
   "ストレートでゆっくりと、花の香りをお楽しみください。"]},
 {id:"cheval",n:"Cheval — Year of the Horse",h:"MARIAGE FRÈRES",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"干支の限定ブレンド。<b>話の種になる</b>一杯として来客に。",
- a:["果実"],o:["来客に"],d:["ストレート"],
+ a:["果実"],o:["来客に"],d:["ストレート"],f:["果物","軽食"],
  url:"https://www.mariagefreres.co.jp/view/item/000000001038",
  desc:["干支にちなんだ限定ブレンド「シュヴァル - 午年」。",
   "ダージリン紅茶に、ライム、オレンジ、キンカン、クコの実、生姜を合わせ、柑橘の華やかさを引き出しています。",
   "ストレートで、フルーティーな香りをそのままお楽しみいただけます。"]},
 {id:"marcopolo",n:"Marco Polo Sublime",h:"MARIAGE FRÈRES",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"花と果実の代名詞。<b>香りだけで一息つける</b>一杯。",
- a:["果実","花"],o:["来客に","家族と"],d:["ストレート","アイス"],
+ a:["果実","花"],o:["来客に","家族と"],d:["ストレート","アイス"],f:["焼き菓子","果物","チョコレート"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000004?category_page_id=ct78",
  desc:["マリアージュ フレールの代名詞「マルコポーロ」を、格上げした限定版「マルコポーロ シュブリーム」。",
   "有機栽培のプレミアムグレード紅茶に、中国とチベットの花と果実の芳香を重ねています。",
   "ストレートで香りを堪能するのはもちろん、アイスにしても華やかさが引き立ちます。"]},
 {id:"wedding",n:"Wedding Impérial",h:"MARIAGE FRÈRES",k:"紅茶",caf:2,temp:95,sec:180,g:"2.5g",
  w:"チョコレートとキャラメルの含み香。<b>お菓子の相棒</b>に。",
- a:["甘い菓子"],o:["家族と","来客に"],d:["ミルク","ストレート"],
+ a:["甘い菓子"],o:["家族と","来客に"],d:["ミルク","ストレート"],f:["チョコレート","焼き菓子"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000014",
  desc:["祝いの席のために生まれた、華やかな「ウェディング アンペリアル」。",
   "ゴールデンアッサム紅茶に、チョコレートとキャラメルの甘い含み香を重ねています。",
   "ミルクを合わせてお菓子と一緒に楽しむのがおすすめですが、ストレートでも十分に甘さを感じられます。"]},
 {id:"poloclub",n:"Polo Club",h:"MARIAGE FRÈRES",k:"マテ茶",caf:1,temp:90,sec:240,g:"2.5g",
  w:"Marco Poloの香りをマテで軽く。<b>眠くならずに香りを楽しむ</b>選択。",
- a:["果実"],o:["仕事中","食後に"],d:["アイス","ストレート"],
+ a:["果実"],o:["仕事中","食後に"],d:["アイス","ストレート"],f:["果物","軽食"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000219",
  desc:["マルコポーロの香りを、マテ茶で軽やかに仕立てた「ポロクラブ」。",
   "グリーンマテ茶に、マルコポーロと同じ中国・チベットの花と果実の芳香を重ねています。",
   "カフェインを抑えつつ香りを楽しみたいときに、ストレートでもアイスでもどうぞ。"]},
 {id:"rose",n:"Rose Milonga",h:"MARIAGE FRÈRES",k:"マテ茶",caf:1,temp:90,sec:240,g:"2.5g",
  w:"マテ緑茶に薔薇とアーモンド。<b>軽やかに気分を上げたい</b>午後に。",
- a:["花","甘い菓子"],o:["家族と","来客に"],d:["アイス","ストレート"],
+ a:["花","甘い菓子"],o:["家族と","来客に"],d:["アイス","ストレート"],f:["焼き菓子","果物"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000245",
  desc:["タンゴのように軽やかで華やかな「ローズ ミロンガ」。",
   "グリーンマテ茶にローズとアーモンドの香りを重ね、優雅な味わいに仕上げています。",
   "ストレートはもちろん、アイスにしても華やかな香りが引き立ちます。"]},
 {id:"lime",n:"Majestic Lime & Ginger",h:"MARIAGE FRÈRES",k:"青茶",caf:1,temp:90,sec:240,g:"3g",
  w:"ライムと生姜の青茶。<b>食後の口直し</b>にいちばん効きます。",
- a:["柑橘","スパイス"],o:["食後に","仕事中"],d:["アイス","ストレート"],
+ a:["柑橘","スパイス"],o:["食後に","仕事中"],d:["アイス","ストレート"],f:["中華・エスニック","和食","軽食"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000901",
  desc:["きらめく柑橘が印象的な青茶ブレンド「マジェスティック ライム&ジンジャー」。",
   "烏龍茶に、ライム、生姜、矢車菊の花びらを合わせ、爽やかな香りに仕上げています。",
   "食後の口直しにストレートで、暑い日にはアイスでもすっきりと楽しめます。"]},
 {id:"ginza",n:"Ginza Premier",h:"MARIAGE FRÈRES",k:"青茶",caf:1,temp:90,sec:240,g:"3g",
  w:"銀座の名を冠した青茶。<b>きちんと淹れて出したい</b>相手がいる日に。",
- a:["花"],o:["来客に","食後に"],d:["ストレート"],
+ a:["花"],o:["来客に","食後に"],d:["ストレート"],f:["和菓子","和食","果物"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000061",
  desc:["東京・銀座店の周年を記念して生まれた特別な青茶「銀座 プルミエ」。",
   "烏龍茶に菊の花と柑橘、黄金のリキュールを思わせる芳香を重ねています。",
   "ストレートで、きちんと淹れて楽しみたい特別な一杯です。"]},
 {id:"pleinelune",n:"Pleine Lune",h:"MARIAGE FRÈRES",k:"紅茶",caf:1,temp:90,sec:240,g:"3g",
  w:"満月の一杯。<b>一日を静かに閉じる</b>時間に。",
- a:["花","素朴"],o:["寝る前","食後に"],d:["ストレート"],
+ a:["花","素朴"],o:["寝る前","食後に"],d:["ストレート"],f:["焼き菓子","チョコレート"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000759",
  desc:["満月の神秘に着想を得た「プレンヌ・リュンヌ」。",
   "紅茶に、アーモンド、ヘーゼルナッツ、シナモン、クローブ、矢車菊の花を重ね、香ばしくスパイシーな余韻を添えています。",
   "ストレートで、静かな夜のひとときにゆっくりとどうぞ。"]},
 {id:"rougemetis",n:"Rouge Métis",h:"MARIAGE FRÈRES",k:"ルイボス",caf:0,temp:100,sec:360,g:"3g",
  w:"ノンカフェインの赤い茶。<b>夜でも、娘さんたちとも</b>分け合えます。",
- a:["果実","甘い菓子"],o:["寝る前","家族と"],d:["ストレート","アイス"],
+ a:["果実","甘い菓子"],o:["寝る前","家族と"],d:["ストレート","アイス"],f:["果物","焼き菓子"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000028",
  desc:["ノンカフェインで楽しめる、南アフリカ産ルイボスの「ルージュ・メティス」。",
   "ルイボスに、グレープフルーツ、エルダーベリー、ローズヒップ、ブルーベリー、バニラ、ラベンダーを重ねた、果実感豊かなブレンドです。",
   "ストレートでもアイスでも、就寝前や家族で分け合う一杯としてどうぞ。"]},
 {id:"gingersummer",n:"Ginger Summer",h:"MARIAGE FRÈRES",k:"紅茶（水出し）",caf:2,temp:0,sec:0,g:"10g",
  w:"生姜とターメリック、レモンの冷浸用紅茶。<b>氷で飲むためだけ</b>に作られています。",
- a:["スパイス","柑橘"],o:["仕事中","食後に","家族と"],d:["アイス"],
+ a:["スパイス","柑橘"],o:["仕事中","食後に","家族と"],d:["アイス"],f:["中華・エスニック","軽食"],
  url:"https://www.mariagefreres.co.jp/view/item/000000001081",
  desc:["水出し専用に仕立てられた、夏のための紅茶「ジンジャー サマー」。",
   "紅茶に生姜、ターメリック、レモンを合わせ、爽やかな香りを引き出しています。",
   "氷を入れた水でじっくり抽出し、冷たいアイスティーとしてお楽しみください。"]},
 {id:"automnebleu",n:"Automne Bleu",h:"MARIAGE FRÈRES",k:"青茶",caf:1,temp:90,sec:240,g:"3g",
  w:"秋の果実をまとった青茶。<b>衣替えのころの夕方</b>によく合います。",
- a:["果実","花"],o:["家族と","食後に","来客に"],d:["ストレート"],
+ a:["果実","花"],o:["家族と","食後に","来客に"],d:["ストレート"],f:["果物","和菓子"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000129",
  desc:["実りの秋を思わせる青茶ブレンド「オータンヌ・ブルー」。",
   "烏龍茶に、ザクロ、ライチ、カリンの香りを重ね、やさしい果実感を添えています。",
   "ストレートで、季節の変わり目の夕方にゆっくりと楽しめます。"]},
 {id:"greentea",n:"緑茶",h:"無銘の缶",k:"緑茶",caf:1,temp:80,sec:60,g:"3g",
  w:"普通の緑茶。<b>いちばん手が伸びる</b>一杯です。",
- a:["素朴"],o:["仕事中","食後に","家族と"],d:["ストレート"]},
+ a:["素朴"],o:["仕事中","食後に","家族と"],d:["ストレート"],f:["和菓子","和食"]},
 {id:"herb",n:"ハーブティー6種アソート",h:"OKINAWA HERB GARDEN",k:"ハーブ",caf:0,temp:100,sec:360,g:"1包",
  w:"完全ノンカフェイン。<b>その日の体調で選べる</b>のが強みです。",
- a:["素朴","柑橘"],o:["寝る前","家族と"],d:["ストレート"],
+ a:["素朴","柑橘"],o:["寝る前","家族と"],d:["ストレート"],f:["果物","和菓子"],
  url:"https://okinawa-herb.jp/category/tea/",
  desc:["無農薬・無香料にこだわった、沖縄県産ハーブの「6種アソート」。",
   "月桃、バタフライピー、ハイビスカス、シークヮーサー、ノニ葉、マロウブルーなど、6つの組み合わせから気分や体調で選べます。",
@@ -287,8 +292,13 @@ const MODES=[
  {id:"a",l:"香り",opts:["スパイス","柑橘","花","果実","甘い菓子","素朴"]},
  {id:"o",l:"場面",opts:["朝いちばん","仕事中","家族と","来客に","食後に","寝る前"]},
  {id:"d",l:"飲み方",opts:["ストレート","ミルク","アイス"]},
+ {id:"f",l:"食べ物",opts:["焼き菓子","チョコレート","果物","和菓子","軽食","和食","中華・エスニック"],
+  ex:{"焼き菓子":"スコーン、クッキー、ショートブレッドなどに。","チョコレート":"チョコレートやチョコ菓子に。",
+   "果物":"フルーツやタルトなど、果物のお菓子に。","和菓子":"どら焼きや大福、羊羹などに。",
+   "軽食":"サンドイッチやキッシュなど、塩気のある軽食に。","和食":"食事中や和食のあとに。",
+   "中華・エスニック":"油やスパイスのきいた料理のあと、口直しに。"}},
 ];
-let mode="now",chip=null,cur=null,near=[],timer=null,left=0;
+let mode="now",chip=null,cur=null,near=[],timer=null,left=0,endAt=0,state="idle",actx=null;
 
 function slot(){const h=new Date().getHours();
   return h<5?"寝る前":h<10?"朝いちばん":h<15?"仕事中":h<19?"家族と":h<22?"食後に":"寝る前";}
@@ -305,7 +315,7 @@ function candidates(){
 function choose(){near=candidates();show(near[Math.floor(Math.random()*near.length)]);}
 function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
 function show(t){
-  cur=t;stop();
+  cur=t;clearTimer();state="idle";left=t.sec;
   const img=document.getElementById("photo");
   img.src=IMG[t.id];img.alt=t.n+"の缶";img.classList.remove("fade");void img.offsetWidth;img.classList.add("fade");
   document.getElementById("house").textContent=t.h;
@@ -316,12 +326,12 @@ function show(t){
   document.getElementById("meta").classList.remove("shown");
   document.getElementById("prog").style.width="0";
   const g=document.getElementById("go");
-  g.textContent=t.sec===0?"冷蔵庫で一晩":"淹れる";
+  label();
   g.style.borderBottomColor=t.sec===0?"transparent":"";
   g.style.cursor=t.sec===0?"default":"pointer";
   strip("near",near,t);strip("all",T,t);
   document.getElementById("nearLabel").textContent=
-    mode==="now"?"いまの時間に合う缶":(chip?chip+"の缶":"この条件に合う缶");
+    mode==="now"?"いまの時間に合う缶":!chip?"この条件に合う缶":mode==="f"?chip+"に合う缶":chip+"の缶";
 }
 function detailHTML(t){
   if(!t.desc)return `<p>${t.w.replace(/<\/?b>/g,"")}</p>`;
@@ -355,22 +365,43 @@ function paint(){
   m.opts.forEach(o=>{const b=document.createElement("button");
     b.className="chip";b.textContent=o;b.setAttribute("aria-pressed",o===chip);
     b.onclick=()=>{chip=o;paint();choose();};c.appendChild(b);});
-  document.getElementById("hint").textContent=chip?"":"ひとつ選んでください。";
+  document.getElementById("hint").textContent=chip?(m.ex&&m.ex[chip])||"":"ひとつ選んでください。";
 }
 document.getElementById("go").onclick=()=>{
   document.getElementById("meta").classList.add("shown");
   if(cur.sec===0)return;
-  if(timer){stop();meta();document.getElementById("prog").style.width="0";return;}
-  left=cur.sec;tick();
-  timer=setInterval(()=>{left--;if(left<=0){stop();done();}else tick();},1000);
-  document.getElementById("go").textContent="とめる";
+  unlockAudio();
+  if(state==="run"){pause();return;}
+  if(state==="done")left=cur.sec;
+  start();
 };
-function tick(){meta(fmt(left));
-  document.getElementById("prog").style.width=(100*(1-left/cur.sec))+"%";}
-function stop(){if(timer){clearInterval(timer);timer=null;}
-  const g=document.getElementById("go");if(g)g.textContent="淹れる";}
+document.getElementById("reset").onclick=()=>{clearTimer();state="idle";left=cur.sec;meta();
+  document.getElementById("prog").style.width="0";label();};
+function start(){state="run";endAt=Date.now()+left*1000;timer=setInterval(tick,250);tick();label();}
+function pause(){left=Math.max(1,Math.ceil((endAt-Date.now())/1000));clearTimer();state="pause";
+  meta(fmt(left));label();}
+function tick(){const rem=(endAt-Date.now())/1000;
+  if(rem<=0){clearTimer();state="done";left=0;done();label();return;}
+  left=Math.ceil(rem);meta(fmt(left));
+  document.getElementById("prog").style.width=(100*(1-rem/cur.sec))+"%";}
+function clearTimer(){if(timer){clearInterval(timer);timer=null;}}
+function label(){const g=document.getElementById("go");
+  g.textContent=cur.sec===0?"冷蔵庫で一晩":{idle:"淹れる",run:"とめる",pause:"つづける",done:"もう一度"}[state];
+  document.getElementById("reset").hidden=state!=="pause";}
 function done(){meta("できました");document.getElementById("prog").style.width="100%";
-  if(navigator.vibrate)navigator.vibrate([180,90,180]);}
+  chime();if(navigator.vibrate)navigator.vibrate([180,90,180]);}
+function unlockAudio(){
+  try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==="suspended")actx.resume();
+    const s=actx.createBufferSource();s.buffer=actx.createBuffer(1,1,22050);
+    s.connect(actx.destination);s.start(0);}catch(e){}}
+function bell(f,t){const g=actx.createGain();
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.3,t+0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+1.8);g.connect(actx.destination);
+  [[1,1],[2.76,0.22],[5.4,0.07]].forEach(([m,v])=>{const o=actx.createOscillator(),og=actx.createGain();
+    o.type="sine";o.frequency.value=f*m;og.gain.value=v;o.connect(og);og.connect(g);o.start(t);o.stop(t+1.9);});}
+function chime(){if(!actx)return;if(actx.state==="suspended")actx.resume();
+  const t=actx.currentTime+0.05;[0,1.6].forEach(r=>{bell(1046.5,t+r);bell(1318.5,t+r+0.22);bell(1568,t+r+0.44);});}
 
 document.getElementById("shelfToggle").onclick=()=>{
   const open=document.getElementById("all").classList.toggle("open");
