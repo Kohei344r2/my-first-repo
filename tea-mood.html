@@ -233,7 +233,7 @@ const T=[
  url:"https://www.mariagefreres.co.jp/view/item/000000000219",
  desc:["マルコポーロの香りを、マテ茶で軽やかに仕立てた「ポロクラブ」。",
   "グリーンマテ茶に、マルコポーロと同じ中国・チベットの花と果実の芳香を重ねています。",
-  "カフェインを抑えつつ香りを楽しみたいときに、ストレートでもアイスでもどうぞ。"]},
+  "マルコポーロの香りを軽やかに楽しみたいときに、ストレートでもアイスでもどうぞ。"]},
 {id:"rose",n:"Rose Milonga",h:"MARIAGE FRÈRES",k:"マテ茶",caf:1,temp:90,sec:240,g:"2.5g",
  w:"マテ緑茶に薔薇とアーモンド。<b>軽やかに気分を上げたい</b>午後に。",
  a:["花","甘い菓子"],o:["家族と","来客に"],d:["アイス","ストレート"],f:["焼き菓子","果物"],
@@ -255,9 +255,9 @@ const T=[
  desc:["東京・銀座店の周年を記念して生まれた特別な青茶「銀座 プルミエ」。",
   "烏龍茶に菊の花と柑橘、黄金のリキュールを思わせる芳香を重ねています。",
   "ストレートで、きちんと淹れて楽しみたい特別な一杯です。"]},
-{id:"pleinelune",n:"Pleine Lune",h:"MARIAGE FRÈRES",k:"紅茶",caf:1,temp:90,sec:240,g:"3g",
+{id:"pleinelune",n:"Pleine Lune",h:"MARIAGE FRÈRES",k:"紅茶",caf:2,temp:90,sec:240,g:"3g",
  w:"満月の一杯。<b>一日を静かに閉じる</b>時間に。",
- a:["花","素朴"],o:["寝る前","食後に"],d:["ストレート"],f:["焼き菓子","チョコレート"],
+ a:["花","素朴"],o:["食後に"],d:["ストレート"],f:["焼き菓子","チョコレート"],
  url:"https://www.mariagefreres.co.jp/view/item/000000000759",
  desc:["満月の神秘に着想を得た「プレンヌ・リュンヌ」。",
   "紅茶に、アーモンド、ヘーゼルナッツ、シナモン、クローブ、矢車菊の花を重ね、香ばしくスパイシーな余韻を添えています。",
@@ -297,7 +297,8 @@ const T=[
 const MODES=[
  {id:"now",l:"いま",opts:null},
  {id:"a",l:"香り",opts:["スパイス","柑橘","花","果実","甘い菓子","素朴"]},
- {id:"o",l:"場面",opts:["朝いちばん","仕事中","家族と","来客に","食後に","寝る前"]},
+ {id:"o",l:"場面",opts:["朝いちばん","仕事中","家族と","来客に","食後に","寝る前"],
+  ex:{"寝る前":"ノンカフェインのお茶だけを選んでいます。"}},
  {id:"d",l:"飲み方",opts:["ストレート","ミルク","アイス"]},
  {id:"f",l:"食べ物",opts:["焼き菓子","チョコレート","果物","和菓子","軽食","和食","中華・エスニック"],
   ex:{"焼き菓子":"スコーン、クッキー、ショートブレッドなどに。","チョコレート":"チョコレートやチョコ菓子に。",
@@ -313,10 +314,11 @@ function lede(){return {"朝いちばん":"朝です。目を覚ます一杯を�
   "家族と":"夕方です。ひと息つく一杯を。","食後に":"夜です。食後の一杯を。",
   "寝る前":"夜更けです。静かに終わる一杯を。"}[slot()];}
 function candidates(){
-  if(mode==="now"){const s=slot();let p=T.filter(t=>t.o.includes(s));
-    if(s==="寝る前"){const q=p.filter(t=>t.caf===0);if(q.length)p=q;}
+  if(mode==="now"){const s=slot();
+    const p=s==="寝る前"?T.filter(t=>t.caf===0):T.filter(t=>t.o.includes(s));
     return p.length?p:T.slice();}
   if(!chip)return T.slice();
+  if(mode==="o"&&chip==="寝る前")return T.filter(t=>t.caf===0);
   return T.filter(t=>t[mode].includes(chip));
 }
 function choose(){near=candidates();show(near[Math.floor(Math.random()*near.length)]);}
@@ -368,7 +370,8 @@ function paint(){
   [...tabs.children].forEach(b=>b.setAttribute("aria-selected",b.dataset.id===mode));
   const m=MODES.find(x=>x.id===mode),c=document.getElementById("chips");
   c.innerHTML="";
-  if(!m.opts){document.getElementById("hint").textContent="いまの時刻から選んでいます。";return;}
+  if(!m.opts){document.getElementById("hint").textContent=slot()==="寝る前"
+    ?"夜更けなので、ノンカフェインのお茶から選んでいます。":"いまの時刻から選んでいます。";return;}
   m.opts.forEach(o=>{const b=document.createElement("button");
     b.className="chip";b.textContent=o;b.setAttribute("aria-pressed",o===chip);
     b.onclick=()=>{chip=o;paint();choose();};c.appendChild(b);});
