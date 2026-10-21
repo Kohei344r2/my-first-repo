@@ -22,7 +22,10 @@
   .steam.s2{animation-delay:1.6s}.steam.s3{animation-delay:3.2s}
   @keyframes rise{0%{opacity:0;transform:translateY(10px)}25%{opacity:.75}
     70%{opacity:.35}100%{opacity:0;transform:translateY(-22px)}}
-  @media(prefers-reduced-motion:reduce){.steam{animation:none;opacity:.55}}
+  .mya-wave{transform-box:fill-box;transform-origin:0% 100%;animation:wave 2.4s ease-in-out infinite}
+  @keyframes wave{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-14deg)}80%{transform:rotate(8deg)}90%{transform:rotate(-10deg)}}
+  .fanart{font-size:9px;letter-spacing:.06em;color:var(--dim);text-align:center;margin:-18px 0 22px;opacity:.85}
+  @media(prefers-reduced-motion:reduce){.steam{animation:none;opacity:.55}.mya-wave{animation:none}}
   figure{margin:0 auto;position:relative;max-width:216px;width:60%;border-radius:2px;
     box-shadow:0 22px 36px -16px rgba(51,41,31,.32)}
   figure img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:2px;
@@ -118,7 +121,7 @@
     <p class="lede" id="lede">…</p>
   </header>
 
-  <svg class="scene" viewBox="0 0 600 300" role="img" aria-label="湯気の立つティーカップとガラスのティーポット">
+  <svg class="scene" viewBox="0 0 600 300" role="img" aria-label="湯気の立つティーカップとガラスのティーポットの横で手を振るミャクミャク">
   <defs>
     <radialGradient id="glow" cx="50%" cy="46%" r="62%">
       <stop offset="0" stop-color="#FFF6EF" stop-opacity=".7"/>
@@ -151,6 +154,15 @@
   <ellipse cx="440" cy="246" rx="70" ry="11" fill="#6E5450" opacity=".2" filter="url(#soft)"/>
   <ellipse cx="108" cy="252" rx="62" ry="9" fill="#6E5450" opacity=".18" filter="url(#soft)"/>
 
+  <!-- Myaku-Myaku (unofficial fan art) -->
+  <g class="mya" transform="translate(126 246)">
+    <ellipse cx="0" cy="2" rx="40" ry="6" fill="#6E5450" opacity=".2" filter="url(#soft)"/>
+    <g fill="none" stroke="#1D6FCF" stroke-width="11" stroke-linecap="round"><path d="M-26 -48 C-40 -40 -45 -28 -43 -18"/><path class="mya-wave" d="M26 -48 C46 -52 58 -64 60 -82"/></g>
+    <path d="M-30 -62 C-35 -32 -35 -12 -26 0 L-9 0 C-7 -7 7 -7 9 0 L26 0 C35 -12 35 -32 30 -62 Z" fill="#1D6FCF"/>
+    <circle cx="0" cy="-80" r="29" fill="#1D6FCF"/>
+    <g fill="#E4262C"><circle cx="-32" cy="-71" r="11"/><circle cx="-33" cy="-90" r="12"/><circle cx="-24" cy="-105" r="13"/><circle cx="-9" cy="-113" r="12"/><circle cx="9" cy="-113" r="13"/><circle cx="24" cy="-104" r="12"/><circle cx="33" cy="-90" r="12"/><circle cx="32" cy="-71" r="11"/></g>
+    <g><circle cx="-24" cy="-105" r="8.2" fill="#FFFFFF"/><circle cx="-22.5" cy="-103.8" r="4.3" fill="#1D6FCF"/><circle cx="9" cy="-113" r="6.6" fill="#FFFFFF"/><circle cx="7.8" cy="-111.6" r="3.4" fill="#1D6FCF"/><circle cx="33" cy="-90" r="6.4" fill="#FFFFFF"/><circle cx="31.4" cy="-89.4" r="3.3" fill="#1D6FCF"/><circle cx="-33" cy="-90" r="5.6" fill="#FFFFFF"/><circle cx="-31.6" cy="-90.4" r="2.9" fill="#1D6FCF"/><circle cx="32" cy="-71" r="5.2" fill="#FFFFFF"/><circle cx="30.8" cy="-70.0" r="2.7" fill="#1D6FCF"/><circle cx="-32" cy="-71" r="4.6" fill="#FFFFFF"/><circle cx="-30.8" cy="-70.0" r="2.4" fill="#1D6FCF"/></g>
+  </g>
   <!-- madeleines on a small plate -->
   <ellipse cx="108" cy="246" rx="60" ry="12" fill="#F6F0EA"/>
   <ellipse cx="108" cy="245" rx="44" ry="7.5" fill="#EBE1D8"/>
@@ -207,6 +219,7 @@
     </g>
   </g>
 </svg>
+  <p class="fanart">ミャクミャクは大阪・関西万博の公式キャラクターです（非公式ファンアート）</p>
 
   <div class="wrap center">
     <p class="pickLabel">選び方</p>
